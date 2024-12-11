@@ -1,10 +1,10 @@
-# PointaFarm
+# PointaFam
 
 ## Introduction
 
-**PointaFarm** is an innovative e-commerce platform bridging the gap between local farmers and urban retailers. By connecting farmers directly to retailers, PointaFarm ensures the delivery of fresh, high-quality, and fairly priced produce. The platform focuses on reducing supply chain inefficiencies, empowering farmers, and making sourcing easier for retailers. Built with cutting-edge technologies, it emphasizes simplicity, reliability, and seamless user experiences.
+**PointaFam** is an innovative e-commerce platform bridging the gap between local farmers and urban retailers. By connecting farmers directly to retailers, PointaFarm ensures the delivery of fresh, high-quality, and fairly priced produce. The platform focuses on reducing supply chain inefficiencies, empowering farmers, and making sourcing easier for retailers. Built with cutting-edge technologies, it emphasizes simplicity, reliability, and seamless user experiences.
 
-- **Backend**: Golang, PostgreSQL  
+- **Backend**: Golang, Gin-Gonic, SQLite  
 - **Frontend**: HTMX, TailwindCSS  
 
 ---
@@ -16,13 +16,13 @@ Connect with me on LinkedIn: [Ferdynand Odhiambo](https://www.linkedin.com/in/fe
 
 ## Installation
 
-To set up and run PointaFarm locally, follow these steps:
+To set up and run PointaFam locally, follow these steps:
 
 ### Prerequisites  
 
 Ensure the following are installed on your machine:
 - [Go](https://golang.org/doc/install) (version 1.19+ recommended)  
-- [PostgreSQL](https://www.postgresql.org/download/)  
+- [SQLite](https://www.sqlite.org/download.html)  
 - Git  
 
 ---
@@ -32,7 +32,7 @@ Ensure the following are installed on your machine:
 ```bash
 git clone https://github.com/MeFerdi/pointa-fam.git
 
-cd pointafarm
+cd pointa-fam
 ```
 ## Backend Setup
 
@@ -40,16 +40,7 @@ cd pointafarm
 ```bash
 go mod download
 ```
-### Set up PostgreSQL:
-- Create a new PostgreSQL database for PointaFarm.
-- Configure the .env file with your database credentials:
-```bash
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=yourusername
-DB_PASSWORD=yourpassword
-DB_NAME=pointafarm_db
-```
+
 - Run database migrations:
 ```bash
 
