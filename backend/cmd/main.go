@@ -16,8 +16,8 @@ func main() {
 	// Load configuration from .env file
 	cfg := config.LoadConfig()
 
-	// Connect to the SQLite database using GORM (or PostgreSQL)
-	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{}) // Use postgres.Open for PostgreSQL
+	
+	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
@@ -41,13 +41,13 @@ func main() {
 	// Initialize Gin router
 	r := gin.Default()
 
-	// Serve static files from the frontend directory
-	r.Static("/frontend", "./frontend")
+	// // Serve static files from the frontend directory
+	// r.Static("/frontend", "./frontend")
 
-	// Serve index.html at root URL
-	r.GET("/", func(c *gin.Context) {
-		c.File("./frontend/index.html")
-	})
+	// // Serve index.html at root URL
+	// r.GET("/", func(c *gin.Context) {
+	// 	c.File("./frontend/index.html")
+	// })
 
 	// Define routes for farmers
 	r.GET("/api/farmers", controllers.GetFarmers)
