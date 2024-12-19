@@ -7,14 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// Migrate function to run migrations
 func Migrate(db *gorm.DB) {
 	err := db.AutoMigrate(
 		&models.Farmer{},
-		// &models.Farm{},
 		&models.Product{},
 		&models.Retailer{},
 		&models.Order{},
+		&models.Cart{},
+		&models.CartItem{},
 	)
 
 	if err != nil {
