@@ -1,0 +1,16 @@
+<ul>
+    {{ range .products }}
+    <li class="border p-2 mb-2">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold">{{ .Name }}</h3>
+                <p>{{ .Description }}</p>
+                <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-32 h-32 object-cover">
+            </div>
+            <div>
+                <button hx-delete="/api/products/{{ .ID }}" hx-target="#products-list" hx-swap="outerHTML" class="bg-red-500 text-white p-2 rounded">Delete</button>
+            </div>
+        </div>
+    </li>
+    {{ end }}
+</ul>

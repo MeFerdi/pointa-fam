@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Farmer Dashboard</h1>
+        <h2 class="text-xl font-bold mb-2">Add New Product</h2>
+        <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML">
+            <input type="text" name="name" placeholder="Product Name" class="border p-2 mb-2 block w-full">
+            <input type="text" name="description" placeholder="Product Description" class="border p-2 mb-2 block w-full">
+            <input type="file" name="image" class="border p-2 mb-2 block w-full">
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Add Product</button>
+        </form>
+        <h2 class="text-xl font-bold mt-4 mb-2">Your Products</h2>
+        <div id="products-list" hx-get="/api/products" hx-trigger="load" hx-target="#products-list" hx-swap="innerHTML"></div>
+    </div>
+</body>
+</html>

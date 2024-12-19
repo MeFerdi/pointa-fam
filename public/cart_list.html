@@ -1,0 +1,15 @@
+<ul>
+    {{ range .cartItems }}
+    <li class="border p-2 mb-2">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold">{{ .ProductName }}</h3>
+                <p>Quantity: {{ .Quantity }}</p>
+            </div>
+            <div>
+                <button hx-delete="/api/cart/{{ .ID }}" hx-target="#cart-list" hx-swap="outerHTML" class="bg-red-500 text-white p-2 rounded">Remove</button>
+            </div>
+        </div>
+    </li>
+    {{ end }}
+</ul>

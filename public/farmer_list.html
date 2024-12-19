@@ -1,0 +1,16 @@
+<ul>
+    {{ range .farmers }}
+    <li class="border p-2 mb-2">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-lg font-bold">{{ .Name }}</h3>
+                <p>Location: {{ .Location }}</p>
+                <p>Contact Info: {{ .ContactInfo }}</p>
+            </div>
+            <div>
+                <button hx-delete="/api/farmers/{{ .ID }}" hx-target="#farmers-list" hx-swap="outerHTML" class="bg-red-500 text-white p-2 rounded">Delete</button>
+            </div>
+        </div>
+    </li>
+    {{ end }}
+</ul>
