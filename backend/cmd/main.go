@@ -5,49 +5,25 @@ import (
 	"pointafam/backend/config"
 	"pointafam/backend/controllers"
 	"pointafam/backend/migrations"
-	"pointafam/backend/services"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite" // Change to postgres if using PostgreSQL
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// Load configuration from .env file
 	cfg := config.LoadConfig()
 
-	
 	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
-	// Run migrations to set up the database schema
 	migrations.Migrate(db)
+	controllers.SetDB(db)
 
-	// Initialize services and set them in controllers
-	farmerService := services.NewFarmerService(db)
-	controllers.SetFarmerService(farmerService)
-
-	productService := services.NewProductService(db)
-	controllers.SetProductService(productService)
-
-	retailerService := services.NewRetailerService(db)
-	controllers.SetRetailerService(retailerService)
-
-	orderService := services.NewOrderService(db)
-	controllers.SetOrderService(orderService)
-
-	// Initialize Gin router
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-
-	// // Serve static files from the frontend directory
-	// r.Static("/frontend", "./frontend")
-
-	// // Serve index.html at root URL
-	// r.GET("/", func(c *gin.Context) {
-	// 	c.File("./frontend/index.html")
-	// })
 
 	// Define routes for farmers
 	r.GET("/api/farmers", controllers.GetFarmers)
@@ -71,7 +47,11 @@ func main() {
 	r.POST("/api/orders", controllers.CreateOrder)
 	r.GET("/api/orders/:retailer_id", controllers.GetOrders)
 
-	// Start server
+	// Define routes for cart
+	r.POST("/api/cart", controllers.AddToCart)
+	r.GET("/api/cart/:retailer_id", controllers.ViewCart)
+	r.DELETE("/api/cart/:item_id", controllers.DeleteFromCart)
+
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
