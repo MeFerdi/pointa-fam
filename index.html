@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PointaFam</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="container mx-auto text-center">
+        <h1 class="text-4xl font-bold mb-4">Welcome to PointaFam</h1>
+        <button class="bg-blue-500 text-white p-4 rounded" hx-get="/static/auth.html" hx-target="body" hx-swap="innerHTML">Get Started</button>
+    </div>
+</body>
+</html>
