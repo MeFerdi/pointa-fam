@@ -24,7 +24,7 @@ func GetProducts(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
 		return
 	}
-	c.JSON(http.StatusOK, products)
+	c.HTML(http.StatusOK, "products_list.html", gin.H{"products": products})
 }
 
 // CreateProduct adds a new product for a farmer

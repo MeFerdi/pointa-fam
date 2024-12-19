@@ -21,19 +21,23 @@ func AddToCart(c *gin.Context) {
 		return
 	}
 	db.Create(&cartItem)
-	c.JSON(http.StatusOK, cartItem)
+	ViewCart(c)
 }
 
 func ViewCart(c *gin.Context) {
-	var cart models.Cart
+	var cart []models.CartItem
 	retailerID := c.Param("retailer_id")
-	db.Preload("Items").Where("retailer_id = ?", retailerID).First(&cart)
-	c.JSON(http.StatusOK, cart)
+	db.Where("retailer_id = ?", retailerID).Find(&cart)
+	c.HTML(http.StatusOK, "cart_list.html", gin.H{"cartItems": cart})
 }
 
 func DeleteFromCart(c *gin.Context) {
 	var cartItem models.CartItem
 	itemID := c.Param("item_id")
-	db.Where("id = ?", itemID).Delete(&cartItem)
-	c.JSON(http.StatusOK, gin.H{"message": "Item deleted"})
+	if err := db.Where("id = ?", itemID).First(&cartItem).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Cart item not found"})
+		return
+	}
+	db.Delete(&cartItem)
+	ViewCart(c)
 }
