@@ -5,6 +5,7 @@ import (
 )
 
 type Farmer struct {
+	gorm.Model
 	ID          uint   `json:"id" gorm:"primaryKey"`
 	Name        string `json:"name"`
 	Location    string `json:"location"`

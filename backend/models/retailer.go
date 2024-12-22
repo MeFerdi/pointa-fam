@@ -5,6 +5,7 @@ import (
 )
 
 type Retailer struct {
+	gorm.Model
 	ID          uint   `json:"id" gorm:"primaryKey"`
 	Name        string `json:"name"`
 	ContactInfo string `json:"contact_info"`
