@@ -14,13 +14,12 @@
             <div>
                 <h2 class="text-xl font-bold mb-2">Register</h2>
                 <form id="register-form" hx-post="/api/register" hx-trigger="submit" hx-target="#register-result" hx-swap="innerHTML">
-                    <input type="text" name="first_name" placeholder="First Name" class="border p-2 mb-2 block w-full" required>
-                    <input type="text" name="last_name" placeholder="Last Name" class="border p-2 mb-2 block w-full" required>
-                    <input type="text" name="location" placeholder="Location" class="border p-2 mb-2 block w-full" required>
+                    <input type="text" name="firstName" placeholder="First Name" class="border p-2 mb-2 block w-full" required>
+                    <input type="text" name="lastName" placeholder="Last Name" class="border p-2 mb-2 block w-full" required>
                     <input type="email" name="email" placeholder="Email Address" class="border p-2 mb-2 block w-full" required>
                     <input type="password" name="password" placeholder="Password" class="border p-2 mb-2 block w-full" required>
                     <input type="password" name="confirm_password" placeholder="Confirm Password" class="border p-2 mb-2 block w-full" required>
-                    <input type="text" name="contact_info" placeholder="Contact Info" class="border p-2 mb-2 block w-full" required>
+                    <input type="text" name="phoneNumber" placeholder="Phone Number" class="border p-2 mb-2 block w-full">
                     <select name="role" class="border p-2 mb-2 block w-full" required>
                         <option value="">Select Role</option>
                         <option value="farmer">Farmer</option>
@@ -29,8 +28,14 @@
                     <button type="submit" class="bg-blue-500 text-white p-2 rounded">Register</button>
                 </form>
                 <div id="register-result"></div>
-                <p class="mt-4">Already registered? <button class="text-blue-500" hx-get="/static/login.html" hx-target="body" hx-swap="innerHTML">Login here</button></p>
+                <p class="mt-4">Already registered? 
+                   <button class="text-blue-500"
+                       hx-get="/static/login.html"
+                       hx-target="#register-result"
+                       hx-swap="innerHTML">Login here</button>
+                </p>
             </div>
+
         </div>
     </div>
 </body>
