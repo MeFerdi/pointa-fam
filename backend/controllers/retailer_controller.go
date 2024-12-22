@@ -25,6 +25,13 @@ func RegisterRetailer(c *gin.Context) {
 		return
 	}
 
+	// // Check if retailer already exists (you may need to implement this in your service)
+	// existingRetailer, err := retailerService.GetRetailerByEmail(retailer.Email)
+	// if err == nil && existingRetailer != nil {
+	// 	c.JSON(http.StatusConflict, gin.H{"error": "Retailer with this email already exists"})
+	// 	return
+	// }
+
 	hashedPassword, err := utils.HashPassword(retailer.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not hash password"})
@@ -49,22 +56,6 @@ func GetRetailers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, retailers)
-}
-
-// CreateRetailer registers a new retailer
-func CreateRetailer(c *gin.Context) {
-	var retailer models.Retailer
-	if err := c.ShouldBindJSON(&retailer); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
-
-	if err := retailerService.CreateRetailer(&retailer); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create retailer"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, retailer)
 }
 
 // UpdateRetailer updates an existing retailer's details

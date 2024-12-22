@@ -8,8 +8,7 @@ type Retailer struct {
 	gorm.Model
 	ID          uint   `json:"id" gorm:"primaryKey"`
 	Name        string `json:"name"`
-	ContactInfo string `json:"contact_info"`
-	Location    string `json:"location"`
+	PhoneNumber string `json:"phoneNumber"`
 	Password    string `json:"password"`
 }
 

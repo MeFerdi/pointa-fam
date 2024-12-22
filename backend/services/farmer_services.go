@@ -19,7 +19,7 @@ func NewFarmerService(db *gorm.DB) *FarmerService {
 // CreateFarmer creates a new farmer in the database
 func (s *FarmerService) CreateFarmer(farmer *models.Farmer) error {
 	// Validate farmer data (e.g., check for empty fields)
-	if farmer.Name == "" || farmer.ContactInfo == "" {
+	if farmer.Name == "" {
 		return errors.New("farmer name and contact info are required")
 	}
 

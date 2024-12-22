@@ -5,11 +5,19 @@ import (
 )
 
 type Config struct {
-	DBPath string // Path to the SQLite database file
+	DBPath string
 }
 
-func LoadConfig() *Config {
-	return &Config{
-		DBPath: os.Getenv("DB_PATH"), // Set this in your .env file
+func LoadConfig() Config {
+	return Config{
+		DBPath: getEnv("DB_PATH", "./data/pointafam.db"),
 	}
+}
+
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }

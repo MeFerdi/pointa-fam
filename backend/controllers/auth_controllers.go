@@ -10,99 +10,122 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
+var db *gorm.DB
 var jwtKey = []byte("your_secret_key")
 
-func Register(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		log.Printf("Registration error: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func SetDB(database *gorm.DB) {
+	db = database
+}
+
+func SignUp(c *gin.Context) {
+	var SignupInput struct {
+		FirstName       string `json:"firstName" binding:"required"`
+		LastName        string `json:"lastName" binding:"required"`
+		Email           string `json:"email" binding:"required,email"`
+		Password        string `json:"password" binding:"required"`
+		ConfirmPassword string `json:"confirm_password" binding:"required"`
+		PhoneNumber     string `json:"phoneNumber"`
+		Role            string `json:"role" binding:"required,oneof=farmer retailer"` // Validate role
+	}
+
+	if err := c.ShouldBindJSON(&SignupInput); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if SignupInput.Password != SignupInput.ConfirmPassword {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Passwords do not match"})
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(SignupInput.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("Failed to hash password: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create user"})
 		return
 	}
 
-	user.Password = string(hashedPassword)
+	user := models.User{
+		Email:       SignupInput.Email,
+		Password:    string(hashedPassword),
+		PhoneNumber: SignupInput.PhoneNumber,
+		FirstName:   SignupInput.FirstName,
+		LastName:    SignupInput.LastName,
+		Role:        SignupInput.Role,
+	}
+
 	if err := db.Create(&user).Error; err != nil {
-		log.Printf("Failed to create user: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		log.Printf("Could not create user: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create user"})
 		return
 	}
 
 	if user.Role == "farmer" {
 		var farmer models.Farmer
 		farmer.Name = user.FirstName + " " + user.LastName
-		farmer.Location = user.Location
-		farmer.ContactInfo = user.ContactInfo
-		farmer.Password = user.Password
+		farmer.PhoneNumber = user.PhoneNumber // Assuming you want to store this as well
+
 		if err := db.Create(&farmer).Error; err != nil {
 			log.Printf("Failed to create farmer: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create farmer"})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create farmer"})
 			return
 		}
 	} else if user.Role == "retailer" {
 		var retailer models.Retailer
 		retailer.Name = user.FirstName + " " + user.LastName
-		retailer.Location = user.Location
-		retailer.ContactInfo = user.ContactInfo
-		retailer.Password = user.Password
+		retailer.PhoneNumber = user.PhoneNumber // Assuming you want to store this as well
+
 		if err := db.Create(&retailer).Error; err != nil {
 			log.Printf("Failed to create retailer: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create retailer"})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create retailer"})
 			return
 		}
 	}
 
-	log.Printf("User registered successfully: %s", user.Email)
-	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
 func Login(c *gin.Context) {
+	var LoginInput struct {
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&LoginInput); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
+		return
+	}
+
 	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		log.Printf("Login error: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := db.Where("email = ?", LoginInput.Email).First(&user).Error; err != nil {
+		log.Printf("User not found: %s - %v", LoginInput.Email, err)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid credentials"})
 		return
 	}
 
-	var dbUser models.User
-	if err := db.Where("email = ?", user.Email).First(&dbUser).Error; err != nil {
-		log.Printf("Invalid login attempt for email: %s - %v", user.Email, err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
-		return
-	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(dbUser.Password), []byte(user.Password)); err != nil {
-		log.Printf("Invalid password for email: %s - %v", user.Email, err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(LoginInput.Password)); err != nil {
+		log.Printf("Invalid password for email: %s - %v", LoginInput.Email, err)
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid credentials"})
 		return
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		Subject:   strconv.Itoa(int(dbUser.ID)),
+		Subject:   strconv.Itoa(int(user.ID)),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		log.Printf("Failed to generate token for email: %s - %v", user.Email, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		log.Printf("Failed to generate token for email: %s - %v", LoginInput.Email, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate token"})
 		return
 	}
 
-	role := dbUser.Role
-	log.Printf("User logged in successfully: %s with role: %s", user.Email, role)
-
-	if role == "farmer" {
-		c.JSON(http.StatusOK, gin.H{"token": tokenString, "redirect": "/static/farmer_dashboard.html"})
-	} else if role == "retailer" {
-		c.JSON(http.StatusOK, gin.H{"token": tokenString, "redirect": "/static/retailer_dashboard.html"})
-	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login successful",
+		"token":   tokenString,
+	})
 }

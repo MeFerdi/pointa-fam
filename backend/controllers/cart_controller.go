@@ -5,14 +5,7 @@ import (
 	"pointafam/backend/models"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
-
-var db *gorm.DB
-
-func SetDB(database *gorm.DB) {
-	db = database
-}
 
 func AddToCart(c *gin.Context) {
 	var cartItem models.CartItem

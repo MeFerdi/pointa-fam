@@ -6,11 +6,12 @@ import (
 
 type Farmer struct {
 	gorm.Model
-	ID          uint   `json:"id" gorm:"primaryKey"`
+
+	ID uint `gorm:"primaryKey"`
+
 	Name        string `json:"name"`
-	Location    string `json:"location"`
-	ContactInfo string `json:"contact_info"`
-	Password    string `json:"password"` // Add password field
+	Password    string `json:"password"`
+	PhoneNumber string `json:"phoneNumber"`
 }
 
 // CreateFarmer inserts a new farmer into the database

@@ -19,7 +19,7 @@ func NewRetailerService(db *gorm.DB) *RetailerService {
 // CreateRetailer adds a new retailer to the database
 func (s *RetailerService) CreateRetailer(retailer *models.Retailer) error {
 	// Validate retailer data (e.g., check for empty fields)
-	if retailer.Name == "" || retailer.ContactInfo == "" {
+	if retailer.Name == "" {
 		return errors.New("retailer name and contact info are required")
 	}
 

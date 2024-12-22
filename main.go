@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"pointafam/backend/config"
 	"pointafam/backend/controllers"
 	"pointafam/backend/middleware"
@@ -16,11 +17,27 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 
+	// Ensure the data directory exists
+	if _, err := os.Stat("./data"); os.IsNotExist(err) {
+		if err := os.Mkdir("./data", os.ModePerm); err != nil {
+			log.Fatalf("Could not create data directory: %v", err)
+		}
+	}
+
+	// Check if the database file exists
+	if _, err := os.Stat(cfg.DBPath); os.IsNotExist(err) {
+		log.Printf("Database file does not exist: %s", cfg.DBPath)
+	} else {
+		log.Printf("Database file exists: %s", cfg.DBPath)
+	}
+
+	// Connect to the database
 	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
+	// Run migrations
 	migrations.Migrate(db)
 	controllers.SetDB(db)
 
@@ -42,7 +59,7 @@ func main() {
 	})
 
 	// Authentication routes
-	r.POST("/api/register", controllers.Register)
+	r.POST("/api/register", controllers.SignUp)
 	r.POST("/api/login", controllers.Login)
 
 	// Protected routes
@@ -60,7 +77,7 @@ func main() {
 		api.DELETE("/products/:id", controllers.DeleteProduct)
 
 		api.GET("/retailers", controllers.GetRetailers)
-		api.POST("/retailers", controllers.CreateRetailer)
+		// api.POST("/retailers", controllers.CreateRetailer)
 		api.PUT("/retailers/:id", controllers.UpdateRetailer)
 		api.DELETE("/retailers/:id", controllers.DeleteRetailer)
 
@@ -72,7 +89,7 @@ func main() {
 		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
 	}
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":8000"); err != nil {
 		log.Fatal(err)
 	}
 }
