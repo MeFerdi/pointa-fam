@@ -87,27 +87,33 @@ func main() {
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
-		api.GET("/farmers", controllers.GetFarmers)
-		api.POST("/farmers", controllers.CreateFarmer)
-		api.PUT("/farmers/:id", controllers.UpdateFarmer)
-		api.DELETE("/farmers/:id", controllers.DeleteFarmer)
+		api.GET("/user/:id", controllers.GetUserProfile)
+		api.PUT("/user/:id", controllers.UpdateUserProfile)
 
 		api.GET("/products", controllers.GetProducts)
 		api.POST("/products", controllers.CreateProduct)
 		api.PUT("/products/:id", controllers.UpdateProduct)
 		api.DELETE("/products/:id", controllers.DeleteProduct)
 
-		api.GET("/retailers", controllers.GetRetailers)
-		// api.POST("/retailers", controllers.CreateRetailer)
-		api.PUT("/retailers/:id", controllers.UpdateRetailer)
-		api.DELETE("/retailers/:id", controllers.DeleteRetailer)
-
-		api.POST("/orders", controllers.CreateOrder)
-		api.GET("/orders/:retailer_id", controllers.GetOrders)
-
 		api.POST("/cart", controllers.AddToCart)
 		api.GET("/cart/:retailer_id", controllers.ViewCart)
 		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
+
+		// api.GET("/orders/current", controllers.GetCurrentOrders)
+		// api.GET("/orders/history", controllers.GetOrderHistory)
+
+		// api.GET("/suppliers", controllers.GetSuppliers)
+		// api.POST("/suppliers", controllers.CreateSupplier)
+
+		// api.GET("/inventory", controllers.GetInventory)
+
+		// api.GET("/sales-analytics", controllers.GetSalesAnalytics)
+
+		// api.GET("/messages", controllers.GetMessages)
+		// api.GET("/feedback", controllers.GetFeedback)
+
+		// api.GET("/resources", controllers.GetResources)
+		// api.GET("/faqs", controllers.GetFAQs)
 	}
 
 	if err := r.Run(":8080"); err != nil {
