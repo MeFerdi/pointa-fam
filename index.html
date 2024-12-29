@@ -3,14 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PointaFam</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <title>Welcome to PointaFam</title>
+    <style>
+        body {
+            background-color: #f0f4f8; /* Light background color */
+            font-family: Arial, sans-serif; /* Clean font */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            text-align: center;
+        }
+        h1 {
+            font-size: 3rem; /* Large heading */
+            color: #2c3e50; /* Darker text color */
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem; /* Slightly larger paragraph text */
+            color: #34495e; /* Medium dark text color */
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #3498db; /* Blue button color */
+            color: white; /* White text on button */
+            padding: 15px 30px; /* Padding for button */
+            border: none;
+            border-radius: 5px; /* Rounded corners */
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Smooth transition */
+        }
+        button:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="container mx-auto text-center">
-        <h1 class="text-4xl font-bold mb-4">Welcome to PointaFam</h1>
-        <button class="bg-blue-500 text-white p-4 rounded" hx-get="/static/auth.html" hx-target="body" hx-swap="innerHTML">Get Started</button>
+<body>
+    <div>
+        <h1>Welcome to PointaFam!</h1>
+        <p>Your journey to connect with farmers and retailers starts here.</p>
+        <button onclick="window.location.href='/auth'">Get Started</button>
     </div>
 </body>
 </html>
