@@ -6,19 +6,110 @@
     <title>Farmer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            if (userID && token) {
+                const response = await fetch(`/api/user/${userID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const user = await response.json();
+                document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
+                document.getElementById('user-email').innerText = user.email;
+                document.getElementById('user-location').innerText = `Location: ${user.location}`;
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="container mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Farmer Dashboard</h1>
-        <h2 class="text-xl font-bold mb-2">Add New Product</h2>
-        <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML">
-            <input type="text" name="name" placeholder="Product Name" class="border p-2 mb-2 block w-full">
-            <input type="text" name="description" placeholder="Product Description" class="border p-2 mb-2 block w-full">
-            <input type="file" name="image" class="border p-2 mb-2 block w-full">
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Add Product</button>
-        </form>
-        <h2 class="text-xl font-bold mt-4 mb-2">Your Products</h2>
-        <div id="products-list" hx-get="/api/products" hx-trigger="load" hx-target="#products-list" hx-swap="innerHTML"></div>
+        <h1 class="text-3xl font-bold mb-6 text-center">Farmer Dashboard</h1>
+
+        <!-- User Profile Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">User Profile</h2>
+            <div class="flex items-center mb-4">
+                <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
+                <div>
+                    <p id="user-name" class="text-lg font-bold">Loading...</p>
+                    <p id="user-email" class="text-gray-600">Loading...</p>
+                    <p id="user-location" class="text-gray-600">Loading...</p>
+                </div>
+            </div>
+            <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
+        </div>
+
+        <!-- Product Management Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Product Management</h2>
+            <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML">
+                <div class="mb-4">
+                    <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded">
+                </div>
+                <div class="mb-4">
+                    <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
+                </div>
+                <div class="mb-4">
+                    <input type="number" name="price" placeholder="Product Price" class="border p-2 w-full rounded">
+                </div>
+                <div class="mb-4">
+                    <input type="file" name="image" class="border p-2 w-full rounded">
+                </div>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Add Product</button>
+            </form>
+            <div id="products-list" hx-get="/api/products" hx-trigger="load" hx-target="#products-list" hx-swap="innerHTML">
+                <!-- Products will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Order Management Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Order Management</h2>
+            <div id="orders-list" hx-get="/api/orders" hx-trigger="load" hx-target="#orders-list" hx-swap="innerHTML">
+                <!-- Orders will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Inventory Management Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Inventory Management</h2>
+            <div id="inventory-list" hx-get="/api/inventory" hx-trigger="load" hx-target="#inventory-list" hx-swap="innerHTML">
+                <!-- Inventory will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Sales Analytics Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Sales Analytics</h2>
+            <div id="sales-analytics" hx-get="/api/sales-analytics" hx-trigger="load" hx-target="#sales-analytics" hx-swap="innerHTML">
+                <!-- Sales analytics will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Communication Tools Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Communication Tools</h2>
+            <div id="messages" hx-get="/api/messages" hx-trigger="load" hx-target="#messages" hx-swap="innerHTML">
+                <!-- Messages will be loaded here dynamically -->
+            </div>
+            <div id="feedback" hx-get="/api/feedback" hx-trigger="load" hx-target="#feedback" hx-swap="innerHTML">
+                <!-- Customer feedback will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Support and Resources Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Support and Resources</h2>
+            <div id="resources" hx-get="/api/resources" hx-trigger="load" hx-target="#resources" hx-swap="innerHTML">
+                <!-- Resources will be loaded here dynamically -->
+            </div>
+            <div id="faqs" hx-get="/api/faqs" hx-trigger="load" hx-target="#faqs" hx-swap="innerHTML">
+                <!-- FAQs will be loaded here dynamically -->
+            </div>
+        </div>
     </div>
 </body>
 </html>
