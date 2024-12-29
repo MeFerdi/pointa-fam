@@ -32,6 +32,7 @@ func SignUp(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&SignupInput); err != nil {
+		log.Printf("Error binding JSON: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
 		return
 	}
@@ -73,6 +74,7 @@ func SignUp(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create farmer"})
 			return
 		}
+		c.JSON(http.StatusOK, gin.H{"redirect": "/farmer/dashboard"})
 	} else if user.Role == "retailer" {
 		var retailer models.Retailer
 		retailer.Name = user.FirstName + " " + user.LastName
@@ -83,9 +85,8 @@ func SignUp(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create retailer"})
 			return
 		}
+		c.JSON(http.StatusOK, gin.H{"redirect": "/retailer/dashboard"})
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
 }
 
 func Login(c *gin.Context) {
@@ -95,6 +96,7 @@ func Login(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&LoginInput); err != nil {
+		log.Printf("Error binding JSON: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
 		return
 	}
@@ -127,5 +129,6 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
 		"token":   tokenString,
+		"role":    user.Role,
 	})
 }
