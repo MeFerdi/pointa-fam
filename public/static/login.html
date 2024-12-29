@@ -23,6 +23,7 @@
             const result = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', result.token);
+                localStorage.setItem('userID', result.userID);
                 if (result.role === 'farmer') {
                     window.location.href = '/farmer/dashboard';
                 } else if (result.role === 'retailer') {
