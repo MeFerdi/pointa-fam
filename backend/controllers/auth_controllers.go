@@ -64,29 +64,24 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	if user.Role == "farmer" {
-		var farmer models.Farmer
-		farmer.Name = user.FirstName + " " + user.LastName
-		farmer.PhoneNumber = user.PhoneNumber // Assuming you want to store this as well
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Subject:   strconv.Itoa(int(user.ID)),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+	})
 
-		if err := db.Create(&farmer).Error; err != nil {
-			log.Printf("Failed to create farmer: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create farmer"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"redirect": "/farmer/dashboard"})
-	} else if user.Role == "retailer" {
-		var retailer models.Retailer
-		retailer.Name = user.FirstName + " " + user.LastName
-		retailer.PhoneNumber = user.PhoneNumber // Assuming you want to store this as well
-
-		if err := db.Create(&retailer).Error; err != nil {
-			log.Printf("Failed to create retailer: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create retailer"})
-			return
-		}
-		c.JSON(http.StatusOK, gin.H{"redirect": "/retailer/dashboard"})
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		log.Printf("Failed to generate token for email: %s - %v", SignupInput.Email, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate token"})
+		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Registration successful",
+		"token":   tokenString,
+		"userID":  user.ID,
+		"role":    user.Role,
+	})
 }
 
 func Login(c *gin.Context) {
@@ -129,6 +124,31 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
 		"token":   tokenString,
+		"userID":  user.ID,
 		"role":    user.Role,
 	})
+}
+
+// User Profile
+func GetUserProfile(c *gin.Context) {
+	var user models.User
+	if err := db.First(&user, c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}
+
+func UpdateUserProfile(c *gin.Context) {
+	var user models.User
+	if err := db.First(&user, c.Param("id")).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+		return
+	}
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
+		return
+	}
+	db.Save(&user)
+	c.JSON(http.StatusOK, user)
 }
