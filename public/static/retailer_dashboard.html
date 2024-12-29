@@ -6,14 +6,88 @@
     <title>Retailer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            if (userID && token) {
+                const response = await fetch(`/api/user/${userID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const user = await response.json();
+                document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
+                document.getElementById('user-email').innerText = user.email;
+                document.getElementById('user-location').innerText = `Location: ${user.location}`;
+            }
+        });
+    </script>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="container mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Retailer Dashboard</h1>
-        <h2 class="text-xl font-bold mb-2">Available Products</h2>
-        <div id="products-list" hx-get="/api/products" hx-trigger="load" hx-target="#products-list" hx-swap="innerHTML"></div>
-        <h2 class="text-xl font-bold mt-4 mb-2">Your Cart</h2>
-        <div id="cart-list" hx-get="/api/cart" hx-trigger="load" hx-target="#cart-list" hx-swap="innerHTML"></div>
+        <h1 class="text-3xl font-bold mb-6 text-center">Retailer Dashboard</h1>
+
+        <!-- User Profile Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">User Profile</h2>
+            <div class="flex items-center mb-4">
+                <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
+                <div>
+                    <p id="user-name" class="text-lg font-bold">Loading...</p>
+                    <p id="user-email" class="text-gray-600">Loading...</p>
+                    <p id="user-location" class="text-gray-600">Loading...</p>
+                </div>
+            </div>
+            <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
+        </div>
+
+        <!-- Product Catalog Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Product Catalog</h2>
+            <div class="mb-4">
+                <input type="text" placeholder="Search Products" class="border p-2 w-full rounded">
+            </div>
+            <div class="mb-4">
+                <select class="border p-2 w-full rounded">
+                    <option value="">Filter by Category</option>
+                    <option value="fruits">Fruits</option>
+                    <option value="vegetables">Vegetables</option>
+                    <option value="dairy">Dairy</option>
+                </select>
+            </div>
+            <div id="product-catalog" hx-get="/api/products" hx-trigger="load" hx-target="#product-catalog" hx-swap="innerHTML">
+                <!-- Products will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Order Management Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Order Management</h2>
+            <div id="current-orders" hx-get="/api/orders/current" hx-trigger="load" hx-target="#current-orders" hx-swap="innerHTML">
+                <!-- Current orders will be loaded here dynamically -->
+            </div>
+            <div id="order-history" hx-get="/api/orders/history" hx-trigger="load" hx-target="#order-history" hx-swap="innerHTML">
+                <!-- Order history will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Cart</h2>
+            <div id="cart-list" hx-get="/api/cart/1" hx-trigger="load" hx-target="#cart-list" hx-swap="innerHTML">
+                <!-- Cart items will be loaded here dynamically -->
+            </div>
+        </div>
+
+        <!-- Inventory Management Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4">Inventory Management</h2>
+            <div id="inventory-list" hx-get="/api/inventory" hx-trigger="load" hx-target="#inventory-list" hx-swap="innerHTML">
+                <!-- Inventory will be loaded here dynamically -->
+            </div>
+        </div>
+        
     </div>
 </body>
 </html>
