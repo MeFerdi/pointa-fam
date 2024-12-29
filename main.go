@@ -44,8 +44,11 @@ func main() {
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 
+	// Set trusted proxies
+	r.SetTrustedProxies([]string{"127.0.0.1"})
+
 	// Serve static files
-	r.Static("/static", "./public")
+	r.Static("/static", "./public/static")
 
 	// Serve the HTML file
 	r.GET("/", func(c *gin.Context) {
@@ -56,6 +59,24 @@ func main() {
 	r.GET("/role_fields.html", func(c *gin.Context) {
 		role := c.Query("role")
 		c.HTML(http.StatusOK, "./public/role_fields.html", gin.H{"role": role})
+	})
+
+	// Serve auth.html and login.html through routes
+	r.GET("/auth", func(c *gin.Context) {
+		c.File("./public/static/auth.html")
+	})
+
+	r.GET("/login", func(c *gin.Context) {
+		c.File("./public/static/login.html")
+	})
+
+	// Serve farmer and retailer dashboards
+	r.GET("/farmer/dashboard", func(c *gin.Context) {
+		c.File("./public/static/farmer_dashboard.html")
+	})
+
+	r.GET("/retailer/dashboard", func(c *gin.Context) {
+		c.File("./public/static/retailer_dashboard.html")
 	})
 
 	// Authentication routes
@@ -89,7 +110,7 @@ func main() {
 		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
 	}
 
-	if err := r.Run(":8000"); err != nil {
+	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
 	}
 }
