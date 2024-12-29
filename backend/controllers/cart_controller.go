@@ -18,10 +18,10 @@ func AddToCart(c *gin.Context) {
 }
 
 func ViewCart(c *gin.Context) {
-	var cart []models.CartItem
+	var cartItems []models.CartItem
 	retailerID := c.Param("retailer_id")
-	db.Where("retailer_id = ?", retailerID).Find(&cart)
-	c.HTML(http.StatusOK, "cart_list.html", gin.H{"cartItems": cart})
+	db.Joins("JOIN carts ON carts.id = cart_items.cart_id").Where("carts.retailer_id = ?", retailerID).Find(&cartItems)
+	c.JSON(http.StatusOK, gin.H{"cartItems": cartItems})
 }
 
 func DeleteFromCart(c *gin.Context) {
