@@ -20,6 +20,9 @@
                 document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('user-location').innerText = `Location: ${user.location}`;
+
+                // Set the token in the form headers
+                document.getElementById('create-product-form').setAttribute('hx-headers', JSON.stringify({ 'Authorization': `Bearer ${token}` }));
             }
         });
     </script>
@@ -45,7 +48,7 @@
         <!-- Product Management Section -->
         <div class="bg-white p-6 rounded-lg shadow-md mb-6">
             <h2 class="text-2xl font-bold mb-4">Product Management</h2>
-            <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML">
+            <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML" enctype="multipart/form-data">
                 <div class="mb-4">
                     <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded">
                 </div>

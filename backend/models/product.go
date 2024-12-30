@@ -11,6 +11,7 @@ type Product struct {
 	Price        float64 `json:"price"`
 	Availability bool    `json:"availability"`
 	FarmID       uint    `json:"farm_id" gorm:"index"`
+	ImageURL     string  `json:"image_url"`
 }
 
 // CreateProduct inserts a new product into the database

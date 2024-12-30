@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"path/filepath"
 	"pointafam/backend/models"
 	"pointafam/backend/services"
 	"strconv" // Import strconv for string to uint conversion
@@ -27,12 +28,30 @@ func GetProducts(c *gin.Context) {
 	c.HTML(http.StatusOK, "products_list.html", gin.H{"products": products})
 }
 
-// CreateProduct adds a new product for a farmer
 func CreateProduct(c *gin.Context) {
 	var product models.Product
-	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+
+	// Parse form data
+	product.Name = c.PostForm("name")
+	product.Description = c.PostForm("description")
+	price, err := strconv.ParseFloat(c.PostForm("price"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price"})
 		return
+	}
+	product.Price = price
+
+	// Handle file upload
+	file, err := c.FormFile("image")
+	if err == nil {
+		// Save the file to the server
+		filename := filepath.Base(file.Filename)
+		filepath := filepath.Join("uploads", filename)
+		if err := c.SaveUploadedFile(file, filepath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
+			return
+		}
+		product.ImageURL = filepath
 	}
 
 	if err := productService.CreateProduct(&product); err != nil {
