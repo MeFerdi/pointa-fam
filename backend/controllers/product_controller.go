@@ -8,6 +8,7 @@ import (
 	"strconv" // Import strconv for string to uint conversion
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // ProductService instance
@@ -41,6 +42,15 @@ func CreateProduct(c *gin.Context) {
 	}
 	product.Price = price
 
+	quantity, err := strconv.Atoi(c.PostForm("quantity"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid quantity"})
+		return
+	}
+	product.Quantity = quantity
+
+	product.Category = c.PostForm("category")
+
 	// Handle file upload
 	file, err := c.FormFile("image")
 	if err == nil {
@@ -54,7 +64,8 @@ func CreateProduct(c *gin.Context) {
 		product.ImageURL = filepath
 	}
 
-	if err := productService.CreateProduct(&product); err != nil {
+	db := c.MustGet("db").(*gorm.DB)
+	if err := product.CreateProduct(db, product); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create product"})
 		return
 	}

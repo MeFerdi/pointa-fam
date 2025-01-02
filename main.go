@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,8 +8,6 @@ import (
 	"pointafam/backend/controllers"
 	"pointafam/backend/middleware"
 	"pointafam/backend/migrations"
-	"pointafam/backend/models"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
@@ -18,27 +15,6 @@ import (
 )
 
 func main() {
-	if len(os.Args) > 1 {
-		// Handle user deletion
-		userID := os.Args[1]
-		db, err := gorm.Open(sqlite.Open("./data/pointafam.db"), &gorm.Config{})
-		if err != nil {
-			log.Fatalf("Could not connect to database: %v", err)
-		}
-
-		id, err := strconv.ParseUint(userID, 10, 32)
-		if err != nil {
-			log.Fatalf("Invalid user ID: %v", err)
-		}
-
-		if err := models.DeleteUser(db, uint(id)); err != nil {
-			log.Fatalf("Could not delete user: %v", err)
-		}
-
-		fmt.Printf("User with ID %d deleted successfully\n", id)
-		return
-	}
-
 	cfg := config.LoadConfig()
 
 	// Ensure the data directory exists
@@ -72,7 +48,7 @@ func main() {
 	r.SetTrustedProxies([]string{"127.0.0.1"})
 
 	// Serve static files
-	r.Static("/static", "./public/static")
+	r.Static("/public", "./public")
 
 	// Serve the HTML file
 	r.GET("/", func(c *gin.Context) {
@@ -113,7 +89,7 @@ func main() {
 	{
 		api.GET("/user/:id", controllers.GetUserProfile)
 		api.PUT("/user/:id", controllers.UpdateUserProfile)
-		api.DELETE("/user/:id", controllers.DeleteUser) // Add this line
+		api.DELETE("/user/:id", controllers.DeleteUser)
 
 		api.GET("/products", controllers.GetProducts)
 		api.POST("/products", controllers.CreateProduct)

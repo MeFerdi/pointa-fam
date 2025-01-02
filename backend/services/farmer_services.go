@@ -55,12 +55,12 @@ func (s *FarmerService) DeleteFarmer(id uint) error {
 	return s.DB.Delete(&farmer).Error
 }
 
-// ManageProducts allows farmers to manage their products (add/update/remove)
-func (s *FarmerService) ManageProducts(farmerID uint, product *models.Product) error {
-	// Logic to manage products associated with this farmer.
-	// This could include creating, updating, or deleting products.
+// // ManageProducts allows farmers to manage their products (add/update/remove)
+// func (s *FarmerService) ManageProducts(farmerID uint, product *models.Product) error {
+// 	// Logic to manage products associated with this farmer.
+// 	// This could include creating, updating, or deleting products.
 
-	// Example: Adding a product to the database.
-	product.FarmID = farmerID // Associate product with the specific farm/farmer
-	return s.DB.Create(product).Error
-}
+// 	// Example: Adding a product to the database.
+// 	product.FarmID = farmerID // Associate product with the specific farm/farmer
+// 	return s.DB.Create(product).Error
+// }

@@ -15,7 +15,7 @@ func NewProductService(db *gorm.DB) *ProductService {
 }
 
 func (s *ProductService) CreateProduct(product *models.Product) error {
-	return product.CreateProduct(s.DB)
+	return product.CreateProduct(s.DB, *product)
 }
 
 func (s *ProductService) GetAllProducts() ([]models.Product, error) {
