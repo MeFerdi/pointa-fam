@@ -19,7 +19,5 @@ func SetupRoutes(r *gin.Engine) {
 
 	// Retailer Routes
 	r.GET("/api/retailers", controllers.GetRetailers)
-	// Order Routes
-	r.POST("/api/orders", controllers.CreateOrder)
-	r.GET("/api/orders/:retailer_id", controllers.GetOrders)
+
 }

@@ -100,9 +100,6 @@ func main() {
 		api.GET("/cart/:retailer_id", controllers.ViewCart)
 		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
 
-		// api.GET("/orders/current", controllers.GetCurrentOrders)
-		// api.GET("/orders/history", controllers.GetOrderHistory)
-
 		// api.GET("/suppliers", controllers.GetSuppliers)
 		// api.POST("/suppliers", controllers.CreateSupplier)
 
