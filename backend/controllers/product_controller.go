@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"path/filepath"
 	"pointafam/backend/models"
 	"pointafam/backend/services"
-	"strconv" // Import strconv for string to uint conversion
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -20,30 +21,49 @@ func SetProductService(service *services.ProductService) {
 }
 
 // GetProducts retrieves all products from the database
-func GetProducts(c *gin.Context) {
-	products, err := productService.GetAllProducts()
-	if err != nil {
+func GetProductsByCategory(c *gin.Context) {
+	category := c.Query("category")
+	var products []models.Product
+
+	db := c.MustGet("db").(*gorm.DB)
+	if err := db.Where("category = ?", category).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
 		return
 	}
+
 	c.HTML(http.StatusOK, "products_list.html", gin.H{"products": products})
 }
 
+// CreateProduct handles the creation of a new product.
 func CreateProduct(c *gin.Context) {
 	var product models.Product
 
 	// Parse form data
 	product.Name = c.PostForm("name")
 	product.Description = c.PostForm("description")
-	price, err := strconv.ParseFloat(c.PostForm("price"), 64)
+	priceStr := c.PostForm("price")
+	if priceStr == "" {
+		log.Printf("Price is empty")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Price is required"})
+		return
+	}
+	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil {
+		log.Printf("Error parsing price: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid price"})
 		return
 	}
 	product.Price = price
 
-	quantity, err := strconv.Atoi(c.PostForm("quantity"))
+	quantityStr := c.PostForm("quantity")
+	if quantityStr == "" {
+		log.Printf("Quantity is empty")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Quantity is required"})
+		return
+	}
+	quantity, err := strconv.Atoi(quantityStr)
 	if err != nil {
+		log.Printf("Error parsing quantity: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid quantity"})
 		return
 	}
@@ -58,14 +78,18 @@ func CreateProduct(c *gin.Context) {
 		filename := filepath.Base(file.Filename)
 		filepath := filepath.Join("uploads", filename)
 		if err := c.SaveUploadedFile(file, filepath); err != nil {
+			log.Printf("Error saving file: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to save file"})
 			return
 		}
 		product.ImageURL = filepath
+	} else {
+		log.Printf("Error getting file: %v", err)
 	}
 
 	db := c.MustGet("db").(*gorm.DB)
-	if err := product.CreateProduct(db, product); err != nil {
+	if err := product.CreateProduct(db); err != nil {
+		log.Printf("Error creating product: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create product"})
 		return
 	}

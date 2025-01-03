@@ -12,7 +12,7 @@ func SetupRoutes(r *gin.Engine) {
 	r.POST("/api/farmers", controllers.CreateFarmer)
 
 	// Product Routes
-	r.GET("/api/products", controllers.GetProducts)
+	// r.GET("/api/products", controllers.GetProducts)
 	r.POST("/api/products", controllers.CreateProduct)
 	r.PUT("/api/products/:id", controllers.UpdateProduct)
 	r.DELETE("/api/products/:id", controllers.DeleteProduct)

@@ -3,114 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to PointaFam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet"> <!-- Google Fonts -->
+    <title>PointaFam - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f0f4f8; /* Light background color */
-            font-family: 'Roboto', sans-serif; /* Modern font */
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Full viewport height */
-            text-align: center;
-            color: #34495e; /* Medium dark text color */
-            position: relative; /* Allow absolute positioning for buttons */
-        }
-        .header {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-        }
         .header img {
-            width: 50px; /* Set logo size */
-            height: auto; /* Maintain aspect ratio */
-            margin-right: 10px; /* Space between logo and text */
-        }
-        .header span {
-            font-size: 1.5rem; /* Font size for logo text */
-            font-style: italic; /* Italic style for text */
-            color: #2c3e50; /* Darker text color */
-        }
-        .container {
-            max-width: 600px; /* Limit container width */
-            padding: 20px;
-            background-color: white; /* White background for content */
-            border-radius: 10px; /* Rounded corners */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-        }
-        h1 {
-            font-size: 2.5rem; /* Adjusted heading size */
-            color: #2c3e50; /* Darker text color */
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.1rem; /* Slightly larger paragraph text */
-            margin-bottom: 30px;
-        }
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px; /* Space between buttons */
-        }
-        button {
-            background-color: #3498db; /* Blue button color */
-            color: white; /* White text on button */
-            padding: 15px 30px; /* Padding for button */
-            border: none;
-            border-radius: 5px; /* Rounded corners */
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition */
-        }
-        button:hover {
-            background-color: #2980b9; /* Darker blue on hover */
-            transform: translateY(-2px); /* Slight lift effect on hover */
+            height: 80px;
         }
         .nav-buttons {
-            position: absolute;
-            top: 20px; /* Distance from the top of the page */
-            right: 20px; /* Distance from the right of the page */
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
         .nav-buttons button {
-            background-color: #e67e22; /* Different color for navigation buttons */
-            margin-left: 10px; /* Space between buttons */
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        footer {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.9rem;
+        .nav-buttons button:hover {
+            background-color: #45a049;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            margin-top: 10px;
         }
     </style>
 </head>
-<body>
-    <div class="header">
+<body class="bg-gray-100">
+    <div class="header flex justify-between items-center p-4 bg-white shadow-md">
         <a href="/">
-            <img src="/public/assets/PointaFam.jpg">
+            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
         </a>
+        <div class="nav-buttons">
+            <button onclick="window.location.href='/about'">About Us</button>
+            <button onclick="window.location.href='/contact'">Contact Us</button>
+            <button onclick="window.location.href='/login'">Login</button>
+        </div>
     </div>
 
-    <div class="nav-buttons">
-        <button onclick="window.location.href='/about'">About Us</button>
-        <button onclick="window.location.href='/contact'">Contact Us</button>
-        <button onclick="window.location.href='/cart'">View Cart</button> <!-- Cart Button -->
+    <div class="container mx-auto mt-10 text-center">
+        <h1 class="text-4xl font-bold mb-6">Welcome to PointaFam</h1>
+        <p class="text-lg mb-6">Connecting farmers with consumers for fresh and organic produce.</p>
+        <button onclick="window.location.href='/auth'" class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-200">Get Started</button>
     </div>
 
-    <div class="container">
-        <h1>Welcome to PointaFam!</h1>
-        <p>Your journey to connect with farmers and retailers starts here.</p>
-        
-        <button onclick="window.location.href='/auth'">Get Started</button>
+    <div class="container mx-auto mt-10">
+        <h2 class="text-3xl font-bold text-center mb-10">Available Products</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Fruits Card -->
+            <div class="card" onclick="window.location.href='/products?category=fruits'">
+                <img src="public/assets/oranges-4566275_1280.jpg" alt="Fruits">
+                <div class="card-title">Fruits</div>
+                <p>Explore a variety of fresh fruits offered by our farmers.</p>
+            </div>
+            <!-- Vegetables Card -->
+            <div class="card" onclick="window.location.href='/products?category=vegetables'">
+                <img src="public/assets/vegetable-4218339_1280.jpg" alt="Vegetables">
+                <div class="card-title">Vegetables</div>
+                <p>Discover a range of fresh vegetables available for you.</p>
+            </div>
+        </div>
     </div>
-
-    <footer>
-        &copy; 2024 PointaFam. All rights reserved.
-    </footer>
 </body>
 </html>
