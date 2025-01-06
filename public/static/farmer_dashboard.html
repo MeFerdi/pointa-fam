@@ -27,6 +27,12 @@
             element.classList.toggle('hidden');
         }
 
+        function logout() {
+            localStorage.removeItem('userID');
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
         async function handleFormSubmit(event, url, method) {
             event.preventDefault();
             const form = event.target;
@@ -226,6 +232,7 @@
                     </div>
                 </div>
                 <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
+                <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-4">Logout</button>
             </div>
         </div>
     </div>
