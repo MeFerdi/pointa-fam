@@ -51,6 +51,9 @@
                 alert('Product saved successfully');
                 // Reload the products list
                 loadProducts();
+                loadMyProducts();
+                form.reset();
+                toggleDropdown('add-product-form');
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.error}`);
@@ -67,11 +70,83 @@
                     <p class="text-gray-600">${product.description}</p>
                     <p class="text-gray-600">$${product.price}</p>
                     <p class="text-gray-600">${product.quantity} in stock</p>
+                    <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
+                    <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
                 </div>
             `).join('');
         }
 
-        document.addEventListener('DOMContentLoaded', loadProducts);
+        async function loadMyProducts() {
+    const userID = localStorage.getItem('userID');
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/user/${userID}/products`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    const products = await response.json();
+    const myProductsList = document.getElementById('my-products-list');
+    myProductsList.innerHTML = products.map(product => `
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+            <p class="text-gray-600">${product.description}</p>
+            <p class="text-gray-600">$${product.price}</p>
+            <p class="text-gray-600">${product.quantity} in stock</p>
+            <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
+            <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
+        </div>
+    `).join('');
+}
+
+async function populateEditForm(productId) {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/products/${productId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (response.status === 401) {
+        alert('Unauthorized. Please log in again.');
+        window.location.href = '/login';
+        return;
+    }
+    const product = await response.json();
+    const form = document.getElementById('create-product-form');
+    form.querySelector('input[name="id"]').value = product.id;
+    form.querySelector('input[name="name"]').value = product.name;
+    form.querySelector('input[name="description"]').value = product.description;
+    form.querySelector('input[name="price"]').value = product.price;
+    form.querySelector('input[name="quantity"]').value = product.quantity;
+    form.querySelector('select[name="category"]').value = product.category;
+    form.querySelector('input[name="availability"]').checked = product.availability;
+    form.querySelector('input[name="farm_id"]').value = product.farm_id;
+    toggleDropdown('add-product-form');
+}
+
+        async function deleteProduct(productId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert('Product deleted successfully');
+                // Reload the products list
+                loadProducts();
+                loadMyProducts();
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            loadMyProducts();
+        });
     </script>
 </head>
 <body class="bg-gray-100 flex">
@@ -86,10 +161,10 @@
         <ul>
             <li class="mb-4"><a href="#overview" class="text-blue-500 hover:underline">Overview</a></li>
             <li class="mb-4"><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="toggleDropdown('add-product-form')">Add New Product</a></li>
-            <li class="mb-4"><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="toggleDropdown('edit-product-form')">Edit Product</a></li>
             <li class="mb-4"><a href="#inventory-tracking" class="text-blue-500 hover:underline">Inventory Tracking</a></li>
             <li class="mb-4"><a href="#view-orders" class="text-blue-500 hover:underline">View Orders</a></li>
             <li class="mb-4"><a href="#manage-profile" class="text-blue-500 hover:underline">Manage Profile</a></li>
+            <li class="mb-4"><a href="#my-products" class="text-blue-500 hover:underline">My Products</a></li>
         </ul>
     </div>
 
@@ -125,6 +200,7 @@
             <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
             <div id="add-product-form" class="hidden">
                 <form id="create-product-form" onsubmit="handleFormSubmit(event, '/api/products', 'POST')" enctype="multipart/form-data">
+                    <input type="hidden" name="id">
                     <div class="mb-4">
                         <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded" required>
                     </div>
@@ -163,43 +239,11 @@
             </div>
         </div>
 
-        <!-- Edit Product Section -->
-        <div id="edit-product" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">Edit Product</h2>
-            <div id="edit-product-form" class="hidden">
-                <form id="edit-product-form" onsubmit="handleFormSubmit(event, '/api/products/:id', 'PUT')" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <input type="number" name="price" placeholder="Product Price" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <input type="number" name="quantity" placeholder="Product Quantity" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <input type="file" name="image" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <select name="category" class="border p-2 w-full rounded">
-                            <option value="">Select Category</option>
-                            <option value="fruits">Fruits</option>
-                            <option value="vegetables">Vegetables</option>
-                            <option value="dairy">Dairy</option>
-                            <option value="meat">Meat</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <input type="checkbox" name="availability" class="mr-2"> Available
-                    </div>
-                    <div class="mb-4">
-                        <input type="number" name="farm_id" placeholder="Farm ID" class="border p-2 w-full rounded">
-                    </div>
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Update Product</button>
-                </form>
+        <!-- My Products Section -->
+        <div id="my-products" class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">My Products</h2>
+            <div id="my-products-list">
+                <!-- My products will be loaded here dynamically -->
             </div>
         </div>
 
