@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const userID = localStorage.getItem('userID');
@@ -20,9 +19,6 @@
                 document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('user-location').innerText = `Location: ${user.location}`;
-
-                // Set the token in the form headers
-                document.getElementById('create-product-form').setAttribute('hx-headers', JSON.stringify({ 'Authorization': `Bearer ${token}` }));
             }
         });
 
@@ -30,6 +26,46 @@
             const element = document.getElementById(id);
             element.classList.toggle('hidden');
         }
+
+        async function handleFormSubmit(event, url, method) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Product saved successfully');
+                // Reload the products list
+                loadProducts();
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        }
+
+        async function loadProducts() {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            const productsList = document.getElementById('products-list');
+            productsList.innerHTML = products.map(product => `
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+                    <p class="text-gray-600">${product.description}</p>
+                    <p class="text-gray-600">$${product.price}</p>
+                    <p class="text-gray-600">${product.quantity} in stock</p>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProducts);
     </script>
 </head>
 <body class="bg-gray-100 flex">
@@ -78,53 +114,54 @@
             </div>
         </div>
 
-       <!-- Add New Product Section -->
-<div id="add-product" class="mb-6">
-    <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
-    <div id="add-product-form" class="hidden">
-        <form id="create-product-form" hx-post="/api/products" hx-target="#products-list" hx-swap="outerHTML" enctype="multipart/form-data">
-            <div class="mb-4">
-                <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded" required>
+        <!-- Add New Product Section -->
+        <div id="add-product" class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
+            <div id="add-product-form" class="hidden">
+                <form id="create-product-form" onsubmit="handleFormSubmit(event, '/api/products', 'POST')" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
+                    </div>
+                    <div class="mb-4">
+                        <input type="number" step="0.01" name="price" placeholder="Product Price" class="border p-2 w-full rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="number" name="quantity" placeholder="Product Quantity" class="border p-2 w-full rounded" required>
+                    </div>
+                    <div class="mb-4">
+                        <input type="file" name="image" class="border p-2 w-full rounded">
+                    </div>
+                    <div class="mb-4">
+                        <select name="category" class="border p-2 w-full rounded" required>
+                            <option value="">Select Category</option>
+                            <option value="fruits">Fruits</option>
+                            <option value="vegetables">Vegetables</option>
+                            <option value="dairy">Dairy</option>
+                            <option value="meat">Meat</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <input type="checkbox" name="availability" class="mr-2"> Available
+                    </div>
+                    <div class="mb-4">
+                        <input type="number" name="farm_id" placeholder="Farm ID" class="border p-2 w-full rounded">
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Add Product</button>
+                </form>
             </div>
-            <div class="mb-4">
-                <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
+            <div id="products-list">
+                <!-- Products will be loaded here dynamically -->
             </div>
-            <div class="mb-4">
-                <input type="number" step="0.01" name="price" placeholder="Product Price" class="border p-2 w-full rounded" required>
-            </div>
-            <div class="mb-4">
-                <input type="number" name="quantity" placeholder="Product Quantity" class="border p-2 w-full rounded" required>
-            </div>
-            <div class="mb-4">
-                <input type="file" name="image" class="border p-2 w-full rounded">
-            </div>
-            <div class="mb-4">
-                <select name="category" class="border p-2 w-full rounded" required>
-                    <option value="">Select Category</option>
-                    <option value="fruits">Fruits</option>
-                    <option value="vegetables">Vegetables</option>
-                    <option value="dairy">Dairy</option>
-                    <option value="meat">Meat</option>
-                </select>
-            </div>
-            <div class="mb-4">
-                <input type="checkbox" name="availability" class="mr-2"> Available
-            </div>
-            <div class="mb-4">
-                <input type="number" name="farm_id" placeholder="Farm ID" class="border p-2 w-full rounded">
-            </div>
-            <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Add Product</button>
-        </form>
-    </div>
-    <div id="products-list" hx-get="/api/products" hx-trigger="load" hx-target="#products-list" hx-swap="innerHTML">
-        <!-- Products will be loaded here dynamically -->
-    </div>
-</div>
+        </div>
+
         <!-- Edit Product Section -->
         <div id="edit-product" class="mb-6">
             <h2 class="text-2xl font-bold mb-4">Edit Product</h2>
             <div id="edit-product-form" class="hidden">
-                <form id="edit-product-form" hx-put="/api/products/:id" hx-target="#products-list" hx-swap="outerHTML" enctype="multipart/form-data">
+                <form id="edit-product-form" onsubmit="handleFormSubmit(event, '/api/products/:id', 'PUT')" enctype="multipart/form-data">
                     <div class="mb-4">
                         <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded">
                     </div>
@@ -163,7 +200,7 @@
         <!-- Inventory Tracking Section -->
         <div id="inventory-tracking" class="mb-6">
             <h2 class="text-2xl font-bold mb-4">Inventory Tracking</h2>
-            <div id="inventory-list" hx-get="/api/inventory" hx-trigger="load" hx-target="#inventory-list" hx-swap="innerHTML">
+            <div id="inventory-list">
                 <!-- Inventory will be loaded here dynamically -->
             </div>
         </div>
@@ -171,7 +208,7 @@
         <!-- View Orders Section -->
         <div id="view-orders" class="mb-6">
             <h2 class="text-2xl font-bold mb-4">View Orders</h2>
-            <div id="orders-list" hx-get="/api/orders" hx-trigger="load" hx-target="#orders-list" hx-swap="innerHTML">
+            <div id="orders-list">
                 <!-- Orders will be loaded here dynamically -->
             </div>
         </div>
