@@ -5,44 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .zoom-out {
-            transition: transform 0.2s;
-        }
-        .zoom-out:hover {
-            transform: scale(1.05);
-        }
-        .category-button {
-            width: 200px;
-            height: 250px;
-            margin: 0 10px;
-        }
-    </style>
     <script>
-        async function loadProductsByCategory(category) {
-            const response = await fetch(`/api/products?category=${category}`);
-            const products = await response.json();
-            const productsList = document.getElementById('products-list');
-            productsList.innerHTML = products.map(product => `
-                <div class="bg-white p-4 rounded-lg shadow-md zoom-out">
-                    <img src="${product.imageURL}" alt="${product.name}" class="w-full h-48 object-cover rounded-t-lg">
-                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-                    <p class="text-gray-600">${product.description}</p>
-                    <p class="text-gray-600">$${product.price}</p>
-                    <p class="text-gray-600">${product.quantity} in stock</p>
-                </div>
-            `).join('');
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            const categoryButtons = document.querySelectorAll('.category-button');
-            categoryButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const category = button.getAttribute('data-category');
-                    loadProductsByCategory(category);
-                });
-            });
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            if (userID && token) {
+                document.getElementById('user-account').innerHTML = `
+                    <button onclick="window.location.href='/farmer/dashboard'" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
+                    <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Logout</button>
+                `;
+            }
         });
+
+        function logout() {
+            localStorage.removeItem('userID');
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
     </script>
 </head>
 <body class="bg-gray-100">
@@ -50,7 +29,7 @@
         <a href="/">
             <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
         </a>
-        <div class="nav-buttons">
+        <div id="user-account" class="nav-buttons">
             <button onclick="window.location.href='/about'">About Us</button>
             <button onclick="window.location.href='/contact'">Contact Us</button>
             <button onclick="window.location.href='/login'">Login</button>
