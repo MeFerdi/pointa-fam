@@ -20,7 +20,7 @@ func SetProductService(service *services.ProductService) {
 	productService = service
 }
 
-// GetProducts retrieves all products from the database
+// GetProductsByCategory retrieves products by category from the database
 func GetProductsByCategory(c *gin.Context) {
 	category := c.Query("category")
 	var products []models.Product
@@ -31,7 +31,34 @@ func GetProductsByCategory(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "products_list.html", gin.H{"products": products})
+	c.JSON(http.StatusOK, products)
+}
+
+// GetProductsByUser retrieves products added by a specific user
+func GetProductsByUser(c *gin.Context) {
+	userID := c.Param("id")
+	var products []models.Product
+
+	db := c.MustGet("db").(*gorm.DB)
+	if err := db.Where("user_id = ?", userID).Find(&products).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
+		return
+	}
+
+	c.JSON(http.StatusOK, products)
+}
+
+func GetProductByID(c *gin.Context) {
+	id := c.Param("id")
+
+	var product models.Product
+	db := c.MustGet("db").(*gorm.DB)
+	if err := db.First(&product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, product)
 }
 
 // CreateProduct handles the creation of a new product.
@@ -86,6 +113,14 @@ func CreateProduct(c *gin.Context) {
 	} else {
 		log.Printf("Error getting file: %v", err)
 	}
+	userIDStr := c.MustGet("userID").(string)
+	userID, err := strconv.ParseUint(userIDStr, 10, 32)
+	if err != nil {
+		log.Printf("Error converting userID: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to convert userID"})
+		return
+	}
+	product.UserID = uint(userID)
 
 	db := c.MustGet("db").(*gorm.DB)
 	if err := product.CreateProduct(db); err != nil {
