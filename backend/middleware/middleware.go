@@ -6,6 +6,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 var jwtKey = []byte("your_secret_key")
@@ -33,6 +34,13 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		c.Set("userID", claims.Subject)
+		c.Next()
+	}
+}
+
+func DBMiddleware(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("db", db)
 		c.Next()
 	}
 }
