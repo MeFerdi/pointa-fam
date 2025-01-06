@@ -20,6 +20,16 @@ func SetProductService(service *services.ProductService) {
 	productService = service
 }
 
+func GetProducts(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var products []models.Product
+	if err := db.Find(&products).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
 // GetProductsByCategory retrieves products by category from the database
 func GetProductsByCategory(c *gin.Context) {
 	category := c.Query("category")
