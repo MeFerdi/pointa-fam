@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retailer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const userID = localStorage.getItem('userID');
@@ -21,79 +20,152 @@
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('user-location').innerText = `Location: ${user.location}`;
             }
+            loadProducts();
+            loadCart();
         });
+
+        async function loadProducts() {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/products', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.status === 401) {
+                alert('Unauthorized. Please log in again.');
+                window.location.href = '/login';
+                return;
+            }
+            const products = await response.json();
+            const productsList = document.getElementById('products-list');
+            productsList.innerHTML = products.map(product => `
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+                    <p class="text-gray-600">${product.description}</p>
+                    <p class="text-gray-600">$${product.price}</p>
+                    <p class="text-gray-600">${product.quantity} in stock</p>
+                    <button onclick="addToCart(${product.id})" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Add to Cart</button>
+                </div>
+            `).join('');
+        }
+
+        async function loadCart() {
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/cart/${userID}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.status === 500) {
+                alert('Error loading cart. Please try again later.');
+                return;
+            }
+            const cartItems = await response.json();
+            const cartList = document.getElementById('cart-list');
+            cartList.innerHTML = cartItems.map(item => `
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-2">${item.product.name}</h3>
+                    <p class="text-gray-600">${item.product.description}</p>
+                    <p class="text-gray-600">$${item.product.price}</p>
+                    <p class="text-gray-600">${item.quantity} in cart</p>
+                    <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        async function addToCart(productId) {
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId, userID, quantity: 1 })
+            });
+
+            if (response.ok) {
+                alert('Product added to cart');
+                loadCart();
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        }
+
+        async function removeFromCart(cartItemId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/cart/${cartItemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert('Product removed from cart');
+                loadCart();
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.error}`);
+            }
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('products-section').classList.add('hidden');
+            document.getElementById('cart-section').classList.add('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('userID');
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/';
+        }
     </script>
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="header">
-        <a href="/">
-            <img src="/public/assets/PointaFam.png" alt="PointaFam Logo">
-        </a>
-        <span>PointaFam</span>
+<body class="bg-gray-100 flex">
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-white p-6 shadow-md h-screen">
+        <div class="mb-6">
+            <a href="/">
+                <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="w-32 mx-auto">
+            </a>
+        </div>
+        <div class="mb-6 text-center">
+            <h2 class="text-xl font-bold" id="user-name">Loading...</h2>
+            <p class="text-gray-600" id="user-email">Loading...</p>
+            <p class="text-gray-600" id="user-location">Loading...</p>
+        </div>
+        <ul class="space-y-4">
+            <li><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="showSection('products-section')">Available Products</a></li>
+            <li><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="showSection('cart-section')">My Cart</a></li>
+            <li><a href="javascript:void(0);" class="text-red-500 hover:underline" onclick="logout()">Logout</a></li>
+        </ul>
     </div>
-    <div class="container mx-auto">
+
+    <!-- Main Content -->
+    <div class="w-3/4 p-6">
         <h1 class="text-3xl font-bold mb-6 text-center">Retailer Dashboard</h1>
 
-        <!-- User Profile Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">User Profile</h2>
-            <div class="flex items-center mb-4">
-                <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
-                <div>
-                    <p id="user-name" class="text-lg font-bold">Loading...</p>
-                    <p id="user-email" class="text-gray-600">Loading...</p>
-                    <p id="user-location" class="text-gray-600">Loading...</p>
-                </div>
-            </div>
-            <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
-        </div>
-
-        <!-- Product Catalog Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Product Catalog</h2>
-            <div class="mb-4">
-                <input type="text" placeholder="Search Products" class="border p-2 w-full rounded">
-            </div>
-            <div class="mb-4">
-                <select class="border p-2 w-full rounded">
-                    <option value="">Filter by Category</option>
-                    <option value="fruits">Fruits</option>
-                    <option value="vegetables">Vegetables</option>
-                    <option value="dairy">Dairy</option>
-                </select>
-            </div>
-            <div id="product-catalog" hx-get="/api/products" hx-trigger="load" hx-target="#product-catalog" hx-swap="innerHTML">
+        <!-- Available Products Section -->
+        <div id="products-section" class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">Available Products</h2>
+            <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Products will be loaded here dynamically -->
             </div>
         </div>
 
-        <!-- Order Management Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Order Management</h2>
-            <div id="current-orders" hx-get="/api/orders/current" hx-trigger="load" hx-target="#current-orders" hx-swap="innerHTML">
-                <!-- Current orders will be loaded here dynamically -->
-            </div>
-            <div id="order-history" hx-get="/api/orders/history" hx-trigger="load" hx-target="#order-history" hx-swap="innerHTML">
-                <!-- Order history will be loaded here dynamically -->
-            </div>
-        </div>
-
-        <!-- Cart Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Cart</h2>
-            <div id="cart-list" hx-get="/api/cart/1" hx-trigger="load" hx-target="#cart-list" hx-swap="innerHTML">
+        <!-- My Cart Section -->
+        <div id="cart-section" class="mb-6 hidden">
+            <h2 class="text-2xl font-bold mb-4">My Cart</h2>
+            <div id="cart-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Cart items will be loaded here dynamically -->
             </div>
         </div>
-
-        <!-- Inventory Management Section -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h2 class="text-2xl font-bold mb-4">Inventory Management</h2>
-            <div id="inventory-list" hx-get="/api/inventory" hx-trigger="load" hx-target="#inventory-list" hx-swap="innerHTML">
-                <!-- Inventory will be loaded here dynamically -->
-            </div>
-        </div>
-        
     </div>
 </body>
 </html>
