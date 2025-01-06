@@ -55,12 +55,32 @@ func (s *FarmerService) DeleteFarmer(id uint) error {
 	return s.DB.Delete(&farmer).Error
 }
 
-// // ManageProducts allows farmers to manage their products (add/update/remove)
-// func (s *FarmerService) ManageProducts(farmerID uint, product *models.Product) error {
-// 	// Logic to manage products associated with this farmer.
-// 	// This could include creating, updating, or deleting products.
+// ManageProducts allows farmers to manage their products (add/update/remove)
+func (s *FarmerService) ManageProducts(farmerID uint, products []models.Product) error {
+	// Check if the farmer exists
+	var farmer models.Farmer
+	if err := s.DB.First(&farmer, farmerID).Error; err != nil {
+		return errors.New("farmer not found")
+	}
 
-// 	// Example: Adding a product to the database.
-// 	product.FarmID = farmerID // Associate product with the specific farm/farmer
-// 	return s.DB.Create(product).Error
-// }
+	// Begin a transaction
+	tx := s.DB.Begin()
+
+	// Remove existing products for the farmer
+	if err := tx.Where("farmer_id = ?", farmerID).Delete(&models.Product{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Add new products for the farmer
+	for _, product := range products {
+		product.FarmerID = farmerID
+		if err := tx.Create(&product).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	// Commit the transaction
+	return tx.Commit().Error
+}
