@@ -77,51 +77,51 @@
         }
 
         async function loadMyProducts() {
-    const userID = localStorage.getItem('userID');
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/user/${userID}/products`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
+            const userID = localStorage.getItem('userID');
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/user/${userID}/products`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const products = await response.json();
+            const myProductsList = document.getElementById('my-products-list');
+            myProductsList.innerHTML = products.map(product => `
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+                    <p class="text-gray-600">${product.description}</p>
+                    <p class="text-gray-600">$${product.price}</p>
+                    <p class="text-gray-600">${product.quantity} in stock</p>
+                    <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
+                    <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
+                </div>
+            `).join('');
         }
-    });
-    const products = await response.json();
-    const myProductsList = document.getElementById('my-products-list');
-    myProductsList.innerHTML = products.map(product => `
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-            <p class="text-gray-600">${product.description}</p>
-            <p class="text-gray-600">$${product.price}</p>
-            <p class="text-gray-600">${product.quantity} in stock</p>
-            <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
-            <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
-        </div>
-    `).join('');
-}
 
-async function populateEditForm(productId) {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/products/${productId}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
+        async function populateEditForm(productId) {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/products/${productId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (response.status === 401) {
+                alert('Unauthorized. Please log in again.');
+                window.location.href = '/login';
+                return;
+            }
+            const product = await response.json();
+            const form = document.getElementById('create-product-form');
+            form.querySelector('input[name="id"]').value = product.id;
+            form.querySelector('input[name="name"]').value = product.name;
+            form.querySelector('input[name="description"]').value = product.description;
+            form.querySelector('input[name="price"]').value = product.price;
+            form.querySelector('input[name="quantity"]').value = product.quantity;
+            form.querySelector('select[name="category"]').value = product.category;
+            form.querySelector('input[name="availability"]').checked = product.availability;
+            form.querySelector('input[name="farm_id"]').value = product.farm_id;
+            toggleDropdown('add-product-form');
         }
-    });
-    if (response.status === 401) {
-        alert('Unauthorized. Please log in again.');
-        window.location.href = '/login';
-        return;
-    }
-    const product = await response.json();
-    const form = document.getElementById('create-product-form');
-    form.querySelector('input[name="id"]').value = product.id;
-    form.querySelector('input[name="name"]').value = product.name;
-    form.querySelector('input[name="description"]').value = product.description;
-    form.querySelector('input[name="price"]').value = product.price;
-    form.querySelector('input[name="quantity"]').value = product.quantity;
-    form.querySelector('select[name="category"]').value = product.category;
-    form.querySelector('input[name="availability"]').checked = product.availability;
-    form.querySelector('input[name="farm_id"]').value = product.farm_id;
-    toggleDropdown('add-product-form');
-}
 
         async function deleteProduct(productId) {
             const token = localStorage.getItem('token');
