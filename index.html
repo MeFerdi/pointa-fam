@@ -9,17 +9,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             const userID = localStorage.getItem('userID');
             const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
             if (userID && token) {
                 document.getElementById('user-account').innerHTML = `
-                    <button onclick="window.location.href='/farmer/dashboard'" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
+                    <button onclick="redirectToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
                     <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Logout</button>
                 `;
             }
         });
 
+        function redirectToDashboard() {
+            const role = localStorage.getItem('role');
+            if (role === 'farmer') {
+                window.location.href = '/farmer/dashboard';
+            } else if (role === 'retailer') {
+                window.location.href = '/retailer/dashboard';
+            }
+        }
+
         function logout() {
             localStorage.removeItem('userID');
             localStorage.removeItem('token');
+            localStorage.removeItem('role');
             window.location.href = '/';
         }
     </script>
