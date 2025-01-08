@@ -12,11 +12,25 @@
             white-space: nowrap; /* Prevents text wrapping */
             border-right: 3px solid; /* Creates a cursor effect */
             animation: blink-caret 0.75s step-end infinite;
+            text-decoration-color: aliceblue;
         }
 
         @keyframes blink-caret {
             from, to { border-color: transparent; }
-            50% { border-color: black; }
+            50% { border-color: rgb(239, 232, 232); }
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bg-homepage {
+            background-image: url('/public/assets/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
         }
     </style>
     <script>
@@ -47,7 +61,7 @@
                     setTimeout(type, typingSpeed);
                 } else {
                     isDeleting = true;
-                    setTimeout(deleteText, 1000); // Wait before starting to delete
+                    setTimeout(deleteText, 1000);
                 }
             }
 
@@ -83,13 +97,15 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+<body class="bg-homepage flex flex-col min-h-screen">
     <header class="bg-green-600 text-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
-            <a href="/">
-                <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
-            </a>
-            <nav id="user-account" class="space-x-4">
+            <div class="flex-shrink-0">
+                <a href="/">
+                    <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
+                </a>
+            </div>
+            <nav id="user-account" class="ml-auto space-x-4">
                 <button onclick="window.location.href='/about'" class="hover:underline">About Us</button>
                 <button onclick="window.location.href='/contact'" class="hover:underline">Contact Us</button>
                 <button onclick="window.location.href='/login'" class="hover:underline">Login</button>
@@ -99,9 +115,10 @@
 
     <main class="container mx-auto flex-grow flex flex-col items-center justify-center text-center">
         <section class="mb-10">
-            <h1 id="welcome-message" class="text-6xl font-bold mb-4 typing-effect"></h1>
-            <p class="text-lg mb-6">Connecting farmers with consumers for fresh and organic produce.</p>
+            <h1 id="welcome-message" class="text-6xl font-bold mb-4 typing-effect text-white"></h1>
+            <p class="text-lg mb-6 text-white">Connecting farmers with consumers for fresh and organic produce.</p>
         </section>
+        
 
         <!-- Featured Products Section -->
         <section class="mb-10 w-full">
@@ -145,14 +162,45 @@
         </section>
     </main>
 
-    <!-- Call to Action Section -->
     <section class="mb-10 justify-center text-center">
-        <h2 class="text-xl font-bold mb-4">Join Our Community!</h2>
-        <p>Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
-        <input type="email" placeholder="Your Email Address" class="mt-4 p-2 border border-gray-300 rounded w-full max-w-xs mx-auto" />
-        <button onclick="#" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Subscribe</button>
+        <h2 class="text-xl font-bold mb-4 text-white">Join Our Community!</h2>
+        <p class="text-white">Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
+        <input id="email-input" type="email" placeholder="Your Email Address" class="mt-4 p-2 border border-gray-300 rounded w-full max-w-xs mx-auto" />
+        <button onclick="subscribe()" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Subscribe</button>
+        <p id="subscription-message" class="mt-4 text-green-500"></p>
     </section>
-
+    
+    <script>
+        function subscribe() {
+            const emailInput = document.getElementById('email-input');
+            const email = emailInput.value;
+            const messageElement = document.getElementById('subscription-message');
+    
+            if (email) {
+                fetch('/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        messageElement.textContent = 'Thank you for subscribing!';
+                        emailInput.value = '';
+                    } else {
+                        messageElement.textContent = 'Subscription failed. Please try again.';
+                    }
+                })
+                .catch(error => {
+                    messageElement.textContent = 'An error occurred. Please try again.';
+                });
+            } else {
+                messageElement.textContent = 'Please enter a valid email address.';
+            }
+        }
+    </script>
     <!-- Footer -->
     <footer class="bg-green-600 text-white py-4">
         <div class="container mx-auto text-center">
