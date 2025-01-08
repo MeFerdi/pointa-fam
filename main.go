@@ -72,6 +72,11 @@ func main() {
 		c.File("./public/static/about.html")
 	})
 
+	// Serve Products by Category page
+	r.GET("/products", func(c *gin.Context) {
+		c.File("./public/static/products_by_category.html")
+	})
+
 	// Serve Contact Us page
 	r.GET("/contact", func(c *gin.Context) {
 		c.File("./public/static/contact.html")
@@ -134,6 +139,9 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Thank you for subscribing!"})
 	})
 
+	// Public API endpoint to get products by category
+	r.GET("/api/products", controllers.GetProductsByCategory)
+
 	// Protected routes
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
@@ -142,13 +150,12 @@ func main() {
 		api.PUT("/user/:id", controllers.UpdateUserProfile)
 		api.DELETE("/user/:id", controllers.DeleteUser)
 
-		api.GET("/products", controllers.GetProductsByCategory)
+		api.GET("/products/:id", controllers.GetProductByID)
+		api.GET("/user/:id/products", controllers.GetProductsByUser)
+
 		api.POST("/products", controllers.CreateProduct)
 		api.PUT("/products/:id", controllers.UpdateProduct)
 		api.DELETE("/products/:id", controllers.DeleteProduct)
-
-		api.GET("/products/:id", controllers.GetProductByID) // Add this line
-		api.GET("/user/:id/products", controllers.GetProductsByUser)
 
 		api.POST("/cart", controllers.AddToCart)
 		api.GET("/cart/:retailer_id", controllers.ViewCart)
