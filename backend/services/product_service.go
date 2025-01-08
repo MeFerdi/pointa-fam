@@ -29,3 +29,10 @@ func (s *ProductService) UpdateProduct(id uint, product *models.Product) error {
 func (s *ProductService) DeleteProduct(id uint) error {
 	return models.DeleteProduct(s.DB, id)
 }
+func (s *ProductService) GetProductsByCategory(category string) ([]models.Product, error) {
+	var products []models.Product
+	if err := s.DB.Where("category = ?", category).Find(&products).Error; err != nil {
+		return nil, err
+	}
+	return products, nil
+}
