@@ -16,6 +16,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// Subscriber model
+type Subscriber struct {
+	ID    uint   `gorm:"primaryKey"`
+	Email string `gorm:"unique;not null"`
+}
+
 func main() {
 	cfg := config.LoadConfig()
 
@@ -40,6 +46,7 @@ func main() {
 	}
 
 	// Run migrations
+	db.AutoMigrate(&Subscriber{})
 	migrations.Migrate(db)
 	controllers.SetDB(db)
 
@@ -100,6 +107,32 @@ func main() {
 
 	// Use the DB middleware
 	r.Use(middleware.DBMiddleware(db))
+
+	// Endpoint to handle subscription
+	r.POST("/subscribe", func(c *gin.Context) {
+		var request struct {
+			Email string `json:"email"`
+		}
+
+		if err := c.BindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request"})
+			return
+		}
+
+		if request.Email == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid email address"})
+			return
+		}
+
+		// Save the email to the database
+		subscriber := Subscriber{Email: request.Email}
+		if err := db.Create(&subscriber).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Subscription failed. Please try again."})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Thank you for subscribing!"})
+	})
 
 	// Protected routes
 	api := r.Group("/api")
