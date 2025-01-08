@@ -16,6 +16,7 @@ type CartItem struct {
 	ProductID uint    `json:"product_id"`
 	Quantity  int     `json:"quantity"`
 	Product   Product `json:"product"`
+	UserID    uint    `json:"user_id"`
 }
 
 // CreateCart inserts a new cart into the database
