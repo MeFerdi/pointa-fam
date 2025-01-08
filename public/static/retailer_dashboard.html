@@ -75,25 +75,25 @@
         }
 
         async function addToCart(productId) {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/cart', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ productId, userID, quantity: 1 })
-            });
+        const userID = localStorage.getItem('userID');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ productId, userID, quantity: 1 })
+        });
 
-            if (response.ok) {
-                alert('Product added to cart');
-                loadCart();
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
-            }
+        if (response.ok) {
+            alert('Product added to cart');
+            loadCart();
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.error}`);
         }
+    }
 
         async function removeFromCart(cartItemId) {
             const token = localStorage.getItem('token');
