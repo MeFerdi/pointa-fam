@@ -11,7 +11,7 @@ type Cart struct {
 }
 
 type CartItem struct {
-	ID        uint    `json:"id" gorm:"primaryKey"`
+	ID        uint    `json:"id" gorm:"primaryKey;autoIncrement"`
 	CartID    uint    `json:"cart_id"`
 	ProductID uint    `json:"product_id"`
 	Quantity  int     `json:"quantity"`
@@ -36,11 +36,6 @@ func GetCart(db *gorm.DB, retailerID uint) (Cart, error) {
 		return cart, nil
 	}
 	return cart, err
-}
-
-// AddCartItem inserts a new cart item into the database
-func (ci *CartItem) AddCartItem(db *gorm.DB) error {
-	return db.Create(ci).Error
 }
 
 // DeleteCartItem deletes a cart item from the database

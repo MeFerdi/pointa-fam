@@ -12,6 +12,18 @@ type User struct {
 	Role        string `json:"role"`
 }
 
+// CreateUser inserts a new user into the database
+func (u *User) CreateUser(db *gorm.DB) error {
+	return db.Create(u).Error
+}
+
+// GetUserByEmail retrieves a user by email from the database
+func GetUserByEmail(db *gorm.DB, email string) (User, error) {
+	var user User
+	err := db.Where("email = ?", email).First(&user).Error
+	return user, err
+}
+
 // DeleteUser removes a user from the database by ID.
 func DeleteUser(db *gorm.DB, id uint) error {
 	return db.Delete(&User{}, id).Error

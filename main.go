@@ -9,6 +9,7 @@ import (
 	"pointafam/backend/controllers"
 	"pointafam/backend/middleware"
 	"pointafam/backend/migrations"
+	"pointafam/backend/models"
 	"pointafam/backend/services"
 
 	"github.com/gin-gonic/gin"
@@ -46,7 +47,7 @@ func main() {
 	}
 
 	// Run migrations
-	db.AutoMigrate(&Subscriber{})
+	db.AutoMigrate(&Subscriber{}, &models.User{}, &models.Cart{}, &models.CartItem{})
 	migrations.Migrate(db)
 	controllers.SetDB(db)
 
@@ -159,7 +160,7 @@ func main() {
 
 		api.POST("/cart", controllers.AddToCart)
 		api.GET("/cart/:retailer_id", controllers.ViewCart)
-		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
+		api.DELETE("/cart/:item_id", controllers.RemoveFromCart)
 	}
 
 	if err := r.Run(":8080"); err != nil {
