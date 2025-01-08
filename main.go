@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"pointafam/backend/config"
 	"pointafam/backend/controllers"
 	"pointafam/backend/middleware"
@@ -54,9 +55,19 @@ func main() {
 	// Serve static files
 	r.Static("/public", "./public")
 
-	// Serve the HTML file
+	// Serve the HTML file for homepage
 	r.GET("/", func(c *gin.Context) {
 		c.File("./index.html")
+	})
+
+	// Serve About Us page
+	r.GET("/about", func(c *gin.Context) {
+		c.File("./public/static/about.html")
+	})
+
+	// Serve Contact Us page
+	r.GET("/contact", func(c *gin.Context) {
+		c.File("./public/static/contact.html")
 	})
 
 	// Serve role fields dynamically
@@ -109,19 +120,6 @@ func main() {
 		api.POST("/cart", controllers.AddToCart)
 		api.GET("/cart/:retailer_id", controllers.ViewCart)
 		api.DELETE("/cart/:item_id", controllers.DeleteFromCart)
-
-		// api.GET("/suppliers", controllers.GetSuppliers)
-		// api.POST("/suppliers", controllers.CreateSupplier)
-
-		// api.GET("/inventory", controllers.GetInventory)
-
-		// api.GET("/sales-analytics", controllers.GetSalesAnalytics)
-
-		// api.GET("/messages", controllers.GetMessages)
-		// api.GET("/feedback", controllers.GetFeedback)
-
-		// api.GET("/resources", controllers.GetResources)
-		// api.GET("/faqs", controllers.GetFAQs)
 	}
 
 	if err := r.Run(":8080"); err != nil {
