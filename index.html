@@ -98,7 +98,7 @@
     </script>
 </head>
 <body class="bg-homepage flex flex-col min-h-screen">
-    <header class="bg-green-600 text-white p-4 shadow-md">
+    <header class="fixed top-0 left-0 right-0 bg-green-600 text-white p-4 shadow-md z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex-shrink-0">
                 <a href="/">
@@ -113,16 +113,15 @@
         </div>
     </header>
 
-    <main class="container mx-auto flex-grow flex flex-col items-center justify-center text-center">
-        <section class="mb-10">
+    <main class="container mx-auto flex-grow flex flex-col items-center justify-start text-center pt-32">
+        <section class="mb-20 mt-16">
             <h1 id="welcome-message" class="text-6xl font-bold mb-4 typing-effect text-white"></h1>
             <p class="text-lg mb-6 text-white">Connecting farmers with consumers for fresh and organic produce.</p>
         </section>
-        
 
         <!-- Featured Products Section -->
-        <section class="mb-10 w-full">
-            <h2 class="text-3xl font-bold mb-4">Featured Products</h2>
+        <section class="mb-20 w-full">
+            <h2 class="text-3xl font-bold mb-8 text-white">Featured Products</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
                     <img src="/public/assets/oranges.jpg" alt="Fruits" class="w-full h-60 object-cover">
@@ -155,27 +154,28 @@
         </section>
 
         <!-- About Section -->
-        <section class="bg-green-100 p-6 rounded-lg mb-10 w-full">
+        <section class="bg-green-100 p-6 rounded-lg mb-20 w-full">
             <h2 class="text-3xl font-bold mb-4">About Us</h2>
             <p>At PointaFam, we believe in sustainable agriculture and connecting local farmers directly to consumers. Our mission is to promote fresh, organic produce while supporting local communities.</p>
             <button onclick="window.location.href='/about'" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Learn More</button>
         </section>
+
+        <!-- Newsletter Section -->
+        <section class="mb-20 justify-center text-center w-full">
+            <h2 class="text-xl font-bold mb-4 text-white">Join Our Community!</h2>
+            <p class="text-white">Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
+            <input id="email-input" type="email" placeholder="Your Email Address" class="mt-4 p-2 border border-gray-300 rounded w-full max-w-xs mx-auto" />
+            <button onclick="subscribe()" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Subscribe</button>
+            <p id="subscription-message" class="mt-4 text-green-500"></p>
+        </section>
     </main>
 
-    <section class="mb-10 justify-center text-center">
-        <h2 class="text-xl font-bold mb-4 text-white">Join Our Community!</h2>
-        <p class="text-white">Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
-        <input id="email-input" type="email" placeholder="Your Email Address" class="mt-4 p-2 border border-gray-300 rounded w-full max-w-xs mx-auto" />
-        <button onclick="subscribe()" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Subscribe</button>
-        <p id="subscription-message" class="mt-4 text-green-500"></p>
-    </section>
-    
     <script>
         function subscribe() {
             const emailInput = document.getElementById('email-input');
             const email = emailInput.value;
             const messageElement = document.getElementById('subscription-message');
-    
+
             if (email) {
                 fetch('/subscribe', {
                     method: 'POST',
@@ -202,7 +202,7 @@
         }
     </script>
     <!-- Footer -->
-    <footer class="bg-green-600 text-white py-4">
+    <footer class="sticky bottom-0 bg-green-600 text-white py-4 z-50">
         <div class="container mx-auto text-center">
             &copy; 2025 PointaFam. All rights reserved.
         </div>
