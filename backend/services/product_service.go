@@ -7,7 +7,7 @@ import (
 )
 
 type ProductService struct {
-	DB *gorm.DB // Database connection instance
+	DB *gorm.DB
 }
 
 func NewProductService(db *gorm.DB) *ProductService {

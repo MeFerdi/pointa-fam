@@ -37,4 +37,16 @@ func main() {
 		log.Fatalf("Could not delete products: %v", err)
 	}
 	log.Println("All products deleted successfully")
+
+	// Delete all cart items
+	if err := db.Exec("DELETE FROM cart_items").Error; err != nil {
+		log.Fatalf("Could not delete cart items: %v", err)
+	}
+	log.Println("All cart items deleted successfully")
+
+	// Delete all carts from the database
+	if err := db.Exec("DELETE FROM carts").Error; err != nil {
+		log.Fatalf("Could not delete carts: %v", err)
+	}
+	log.Println("All carts deleted successfully")
 }
