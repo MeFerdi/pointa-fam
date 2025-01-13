@@ -6,11 +6,11 @@
     <title>PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Animation for typing effect */
+       
         .typing-effect {
-            overflow: hidden; /* Ensures the text doesn't overflow */
-            white-space: nowrap; /* Prevents text wrapping */
-            border-right: 3px solid; /* Creates a cursor effect */
+            overflow: hidden;
+            white-space: nowrap; 
+            border-right: 3px solid; 
             animation: blink-caret 0.75s step-end infinite;
             text-decoration-color: aliceblue;
         }
@@ -33,71 +33,9 @@
             min-height: 100vh;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            const role = localStorage.getItem('role');
-            if (userID && token) {
-                document.getElementById('user-account').innerHTML = `
-                    <button onclick="redirectToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
-                    <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Logout</button>
-                `;
-            }
-
-            // Typing and deleting effect
-            const messages = ["Welcome to PointaFam", "Connecting farmers with consumers"];
-            let currentMessageIndex = 0;
-            let currentCharIndex = 0;
-            let isDeleting = false;
-            let typingSpeed = 150; // Typing speed in milliseconds
-            let deletingSpeed = 100; // Deleting speed in milliseconds
-            let typingElement = document.getElementById('welcome-message');
-
-            function type() {
-                if (currentCharIndex < messages[currentMessageIndex].length) {
-                    typingElement.textContent += messages[currentMessageIndex].charAt(currentCharIndex);
-                    currentCharIndex++;
-                    setTimeout(type, typingSpeed);
-                } else {
-                    isDeleting = true;
-                    setTimeout(deleteText, 1000);
-                }
-            }
-
-            function deleteText() {
-                if (currentCharIndex > 0) {
-                    typingElement.textContent = messages[currentMessageIndex].substring(0, currentCharIndex - 1);
-                    currentCharIndex--;
-                    setTimeout(deleteText, deletingSpeed);
-                } else {
-                    isDeleting = false;
-                    currentMessageIndex = (currentMessageIndex + 1) % messages.length; // Move to the next message
-                    setTimeout(type, 500); // Wait before starting to type the next message
-                }
-            }
-
-            type(); // Start typing effect
-        });
-
-        function redirectToDashboard() {
-            const role = localStorage.getItem('role');
-            if (role === 'farmer') {
-                window.location.href = '/farmer/dashboard';
-            } else if (role === 'retailer') {
-                window.location.href = '/retailer/dashboard';
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('userID');
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            window.location.href = '/';
-        }
-    </script>
 </head>
 <body class="bg-homepage flex flex-col min-h-screen">
+    <script src="/public/script/script.js"></script>
     <header class="fixed top-0 left-0 right-0 bg-green-600 text-white p-4 shadow-md z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex-shrink-0">
@@ -119,7 +57,7 @@
             <p class="text-lg mb-6 text-white">Connecting farmers with consumers for fresh and organic produce.</p>
         </section>
 
-        <!-- Featured Products Section -->
+        
         <section class="mb-20 w-full">
             <h2 class="text-3xl font-bold mb-8 text-white">Featured Products</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
@@ -149,18 +87,17 @@
                     </div>
                 </div>
 
-                <!-- Add more product categories as needed -->
             </div>
         </section>
 
-        <!-- About Section -->
+       
         <section class="bg-green-100 p-6 rounded-lg mb-20 w-full">
             <h2 class="text-3xl font-bold mb-4">About Us</h2>
             <p>At PointaFam, we believe in sustainable agriculture and connecting local farmers directly to consumers. Our mission is to promote fresh, organic produce while supporting local communities.</p>
             <button onclick="window.location.href='/about'" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Learn More</button>
         </section>
 
-        <!-- Newsletter Section -->
+       
         <section class="mb-20 justify-center text-center w-full">
             <h2 class="text-xl font-bold mb-4 text-white">Join Our Community!</h2>
             <p class="text-white">Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
@@ -169,38 +106,6 @@
             <p id="subscription-message" class="mt-4 text-green-500"></p>
         </section>
     </main>
-
-    <script>
-        function subscribe() {
-            const emailInput = document.getElementById('email-input');
-            const email = emailInput.value;
-            const messageElement = document.getElementById('subscription-message');
-
-            if (email) {
-                fetch('/subscribe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: email })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        messageElement.textContent = 'Thank you for subscribing!';
-                        emailInput.value = '';
-                    } else {
-                        messageElement.textContent = 'Subscription failed. Please try again.';
-                    }
-                })
-                .catch(error => {
-                    messageElement.textContent = 'An error occurred. Please try again.';
-                });
-            } else {
-                messageElement.textContent = 'Please enter a valid email address.';
-            }
-        }
-    </script>
     <!-- Footer -->
     <footer class="sticky bottom-0 bg-green-600 text-white py-4 z-50">
         <div class="container mx-auto text-center">
