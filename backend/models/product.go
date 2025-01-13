@@ -12,8 +12,8 @@ type Product struct {
 	Quantity    int     `json:"quantity" binding:"required"`
 	ImageURL    string  `json:"image_url"`
 	Category    string  `json:"category" binding:"required"`
-	FarmerID    uint    `json:"farm_id"` // Foreign key
-	UserID      uint    `json:"user_id"` // Foreign key
+	FarmerID    uint    `json:"farm_id"`
+	UserID      uint    `json:"user_id"`
 }
 
 // CreateProduct inserts a new product into the database
