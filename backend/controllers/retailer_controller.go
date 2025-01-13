@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"pointafam/backend/models"
 	"pointafam/backend/services"
-	"pointafam/backend/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,25 +18,22 @@ func SetRetailerService(service *services.RetailerService) {
 
 // RegisterRetailer handles retailer registration
 func RegisterRetailer(c *gin.Context) {
-	var retailer models.Retailer
-	if err := c.ShouldBindJSON(&retailer); err != nil {
+	var retailerInput struct {
+		Username    string `json:"username" binding:"required"`
+		PhoneNumber string `json:"phoneNumber"`
+		Location    string `json:"location"`
+	}
+
+	if err := c.ShouldBindJSON(&retailerInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
 
-	// // Check if retailer already exists (you may need to implement this in your service)
-	// existingRetailer, err := retailerService.GetRetailerByEmail(retailer.Email)
-	// if err == nil && existingRetailer != nil {
-	// 	c.JSON(http.StatusConflict, gin.H{"error": "Retailer with this email already exists"})
-	// 	return
-	// }
-
-	hashedPassword, err := utils.HashPassword(retailer.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not hash password"})
-		return
+	retailer := models.Retailer{
+		Name:        retailerInput.Username,
+		PhoneNumber: retailerInput.PhoneNumber,
+		Location:    retailerInput.Location,
 	}
-	retailer.Password = hashedPassword
 
 	if err := retailerService.CreateRetailer(&retailer); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to create retailer"})
