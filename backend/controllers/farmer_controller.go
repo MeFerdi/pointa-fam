@@ -30,12 +30,17 @@ func UpdateFarmer(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Farmer not found"})
 		return
 	}
-	if err := c.ShouldBind(&farmer); err != nil {
+	if err := c.ShouldBindJSON(&farmer); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	db.Save(&farmer)
-	GetFarmers(c)
+	idInt := 0
+	farmer.ID = uint(idInt)
+	if err := db.Save(&farmer).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Farmer updated successfully"})
 }
 
 func DeleteFarmer(c *gin.Context) {
