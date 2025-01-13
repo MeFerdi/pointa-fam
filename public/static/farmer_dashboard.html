@@ -5,151 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            if (userID && token) {
-                const response = await fetch(`/api/user/${userID}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const user = await response.json();
-                document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
-                document.getElementById('user-email').innerText = user.email;
-                document.getElementById('user-location').innerText = `Location: ${user.location}`;
-            }
-        });
-
-        function toggleDropdown(id) {
-            const element = document.getElementById(id);
-            element.classList.toggle('hidden');
-        }
-
-        function logout() {
-            localStorage.removeItem('userID');
-            localStorage.removeItem('token');
-            window.location.href = '/';
-        }
-
-        async function handleFormSubmit(event, url, method) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            const token = localStorage.getItem('token');
-
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            if (response.ok) {
-                alert('Product saved successfully');
-                // Reload the products list
-                loadProducts();
-                loadMyProducts();
-                form.reset();
-                toggleDropdown('add-product-form');
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
-            }
-        }
-
-        async function loadProducts() {
-            const response = await fetch('/api/products');
-            const products = await response.json();
-            const productsList = document.getElementById('products-list');
-            productsList.innerHTML = products.map(product => `
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-                    <p class="text-gray-600">${product.description}</p>
-                    <p class="text-gray-600">$${product.price}</p>
-                    <p class="text-gray-600">${product.quantity} in stock</p>
-                    <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
-                    <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
-                </div>
-            `).join('');
-        }
-
-        async function loadMyProducts() {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/user/${userID}/products`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const products = await response.json();
-            const myProductsList = document.getElementById('my-products-list');
-            myProductsList.innerHTML = products.map(product => `
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-                    <p class="text-gray-600">${product.description}</p>
-                    <p class="text-gray-600">$${product.price}</p>
-                    <p class="text-gray-600">${product.quantity} in stock</p>
-                    <button onclick="populateEditForm(${product.id})" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Update</button>
-                    <button onclick="deleteProduct(${product.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Delete</button>
-                </div>
-            `).join('');
-        }
-
-        async function populateEditForm(productId) {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/products/${productId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (response.status === 401) {
-                alert('Unauthorized. Please log in again.');
-                window.location.href = '/login';
-                return;
-            }
-            const product = await response.json();
-            const form = document.getElementById('create-product-form');
-            form.querySelector('input[name="id"]').value = product.id;
-            form.querySelector('input[name="name"]').value = product.name;
-            form.querySelector('input[name="description"]').value = product.description;
-            form.querySelector('input[name="price"]').value = product.price;
-            form.querySelector('input[name="quantity"]').value = product.quantity;
-            form.querySelector('select[name="category"]').value = product.category;
-            form.querySelector('input[name="availability"]').checked = product.availability;
-            form.querySelector('input[name="farm_id"]').value = product.farm_id;
-            toggleDropdown('add-product-form');
-        }
-
-        async function deleteProduct(productId) {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/products/${productId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                alert('Product deleted successfully');
-                // Reload the products list
-                loadProducts();
-                loadMyProducts();
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadProducts();
-            loadMyProducts();
-        });
-    </script>
 </head>
 <body class="bg-gray-100 flex">
+    <script src="/public/script/script.js"></script>
     <div class="header">
         <a href="/">
             <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
@@ -264,21 +122,36 @@
         </div>
 
         <!-- Manage Profile Section -->
-        <div id="manage-profile" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">Manage Profile</h2>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex items-center mb-4">
-                    <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
-                    <div>
-                        <p id="user-name" class="text-lg font-bold">Loading...</p>
-                        <p id="user-email" class="text-gray-600">Loading...</p>
-                        <p id="user-location" class="text-gray-600">Loading...</p>
-                    </div>
-                </div>
-                <button class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
-                <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-4">Logout</button>
+<div id="manage-profile" class="mb-6">
+    <h2 class="text-2xl font-bold mb-4">Manage Profile</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex items-center mb-4">
+            <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
+            <div>
+                <p id="user-username" class="text-lg font-bold">Loading...</p>
+                <p id="user-email" class="text-gray-600">Loading...</p>
+                <p id="user-location" class="text-gray-600">Loading...</p>
             </div>
         </div>
+        <button onclick="toggleDropdown('edit-profile-form')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
+        <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-4">Logout</button>
     </div>
+</div>
+
+<!-- Edit Profile Form -->
+<div id="edit-profile-form" class="hidden">
+    <form id="update-profile-form" onsubmit="handleProfileUpdate(event)">
+        <div class="mb-4">
+            <input type="text" id="edit-username" name="username" placeholder="Username" class="border p-2 w-full rounded" required>
+        </div>
+        <div class="mb-4">
+            <input type="email" id="edit-email" name="email" placeholder="Email" class="border p-2 w-full rounded" required>
+        </div>
+        <div class="mb-4">
+            <input type="text" id="edit-location" name="location" placeholder="Location" class="border p-2 w-full rounded" required>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Update Profile</button>
+    </form>
+</div>
 </body>
 </html>

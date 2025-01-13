@@ -12,135 +12,9 @@
             background-position: center;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            if (userID && token) {
-                const response = await fetch(`/api/user/${userID}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const user = await response.json();
-                document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
-                document.getElementById('user-email').innerText = user.email;
-                document.getElementById('user-location').innerText = `Location: ${user.location}`;
-            }
-            loadProducts();
-            loadCart();
-        });
-
-        async function loadProducts(category = '') {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/products?category=${category}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (response.status === 401) {
-                alert('Unauthorized. Please log in again.');
-                window.location.href = '/login';
-                return;
-            }
-            const products = await response.json();
-            const productsList = document.getElementById('products-list');
-            productsList.innerHTML = products.map(product => `
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-                    <p class="text-gray-600">${product.description}</p>
-                    <p class="text-gray-600">$${product.price}</p>
-                    <p class="text-gray-600">${product.quantity} in stock</p>
-                    <button onclick="addToCart(${product.id})" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Add to Cart</button>
-                </div>
-            `).join('');
-        }
-
-        async function loadCart() {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/cart/${userID}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            if (response.status === 500) {
-                alert('Error loading cart. Please try again later.');
-                return;
-            }
-            const cartItems = await response.json();
-            const cartList = document.getElementById('cart-list');
-            if (cartItems.length === 0) {
-                cartList.innerHTML = '<p class="text-center text-gray-600">Cart empty</p>';
-            } else {
-                cartList.innerHTML = cartItems.map(item => `
-                    <div class="bg-white p-4 rounded-lg shadow-md">
-                        <h3 class="text-xl font-bold mb-2">${item.product.name}</h3>
-                        <p class="text-gray-600">${item.product.description}</p>
-                        <p class="text-gray-600">$${item.product.price}</p>
-                        <p class="text-gray-600">${item.quantity} in cart</p>
-                        <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">Remove</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-        async function addToCart(productId) {
-            const userID = localStorage.getItem('userID');
-            const token = localStorage.getItem('token');
-            const response = await fetch('/api/cart', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ productId: productId, userID: parseInt(userID), quantity: 1 })
-            });
-
-            if (response.ok) {
-                alert('Product added to cart');
-                loadCart(); // Reload the cart to show the added product
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
-            }
-        }
-
-        async function removeFromCart(cartItemId) {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`/api/cart/${cartItemId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                alert('Product removed from cart');
-                loadCart(); // Reload the cart to show the updated items
-            } else {
-                const error = await response.json();
-                alert(`Error: ${error.error}`);
-            }
-        }
-
-        function showCart() {
-            document.getElementById('cart-modal').classList.remove('hidden');
-        }
-
-        function hideCart() {
-            document.getElementById('cart-modal').classList.add('hidden');
-        }
-
-        function logout() {
-            localStorage.removeItem('userID');
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            window.location.href = '/';
-        }
-    </script>
 </head>
 <body class="bg-gray-100 flex">
+    <script src="/public/script/script.js"></script>
     <!-- Sidebar -->
     <div class="w-1/5 bg-white p-4 shadow-md h-screen flex flex-col justify-between">
         <div>
@@ -162,23 +36,20 @@
         <div>
             <h3 class="text-md font-bold mb-2">Manage Profile</h3>
             <ul class="space-y-3">
-                <li><a href="javascript:void(0);" class="text-blue-500 hover:underline">Edit Profile</a></li>
+                <li><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="toggleDropdown('edit-profile-form')">Edit Profile</a></li>
                 <li><a href="javascript:void(0);" class="text-red-500 hover:underline" onclick="logout()">Logout</a></li>
             </ul>
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="w-4/5 p-6">
         <h1 class="text-3xl font-bold mb-6 text-center">Retailer Dashboard</h1>
 
-        <!-- Card Section -->
         <div class="bg-agriculture p-6 rounded-lg shadow-md mb-6">
             <h2 class="text-2xl font-bold">Welcome to your Dashboard</h2>
             <p>Manage your products, view your cart, and update your profile.</p>
         </div>
 
-        <!-- Available Products Section -->
         <div id="products-section" class="mb-6">
             <h2 class="text-2xl font-bold mb-4">Available Products</h2>
             <div class="mb-4">
@@ -188,16 +59,13 @@
                     <option value="vegetables">Vegetables</option>
                     <option value="fruits">Fruits</option>
                     <option value="dairy">Dairy</option>
-                    <!-- Add more categories as needed -->
                 </select>
             </div>
             <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Products will be loaded here dynamically -->
             </div>
         </div>
     </div>
 
-    <!-- Cart Modal -->
     <div id="cart-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-3xl">
             <div class="flex justify-between items-center mb-4">
@@ -205,9 +73,26 @@
                 <button onclick="hideCart()" class="text-gray-600 hover:text-gray-900">&times;</button>
             </div>
             <div id="cart-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Cart items will be loaded here dynamically -->
             </div>
         </div>
+    </div>
+
+    <div id="edit-profile-form" class="hidden">
+        <form id="update-profile-form" onsubmit="handleProfileUpdate(event)">
+            <div class="mb-4">
+                <input type="text" id="edit-first-name" name="firstName" placeholder="First Name" class="border p-2 w-full rounded" required>
+            </div>
+            <div class="mb-4">
+                <input type="text" id="edit-last-name" name="lastName" placeholder="Last Name" class="border p-2 w-full rounded" required>
+            </div>
+            <div class="mb-4">
+                <input type="email" id="edit-email" name="email" placeholder="Email" class="border p-2 w-full rounded" required>
+            </div>
+            <div class="mb-4">
+                <input type="text" id="edit-location" name="location" placeholder="Location" class="border p-2 w-full rounded" required>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Update Profile</button>
+        </form>
     </div>
 </body>
 </html>

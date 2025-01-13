@@ -26,7 +26,7 @@
                 const data = await response.json();
                 localStorage.setItem('userID', data.userID);
                 localStorage.setItem('token', data.token);
-                localStorage.setItem('role', data.role); // Store the user's role
+                localStorage.setItem('role', data.role);
                 redirectToDashboard(data.role);
             } else {
                 const error = await response.json();
