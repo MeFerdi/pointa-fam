@@ -4,12 +4,16 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	Email       string `json:"email" gorm:"unique"`
-	Password    string `json:"password"`
-	PhoneNumber string `json:"phone_number"`
-	Role        string `json:"role"`
+	Username    string   `json:"username"`
+	Email       string   `json:"email" gorm:"unique"`
+	Password    string   `json:"password"`
+	PhoneNumber string   `json:"phone_number"`
+	Location    string   `json:"location"`
+	Role        string   `json:"role"`
+	FarmerID    uint     `json:"farmer_id"`
+	Farmer      Farmer   `json:"farmer" gorm:"foreignKey:FarmerID"`
+	RetailerID  uint     `json:"retailer_id"`
+	Retailer    Retailer `json:"retailer" gorm:"foreignKey:RetailerID"`
 }
 
 // CreateUser inserts a new user into the database
