@@ -22,12 +22,12 @@ func SetDB(database *gorm.DB) {
 
 func SignUp(c *gin.Context) {
 	var SignupInput struct {
-		FirstName       string `json:"firstName" binding:"required"`
-		LastName        string `json:"lastName" binding:"required"`
+		Username        string `json:"username" binding:"required"`
 		Email           string `json:"email" binding:"required,email"`
 		Password        string `json:"password" binding:"required"`
 		ConfirmPassword string `json:"confirm_password" binding:"required"`
 		PhoneNumber     string `json:"phoneNumber"`
+		Location        string `json:"location"`
 		Role            string `json:"role" binding:"required,oneof=farmer retailer"` // Validate role
 	}
 
@@ -50,11 +50,11 @@ func SignUp(c *gin.Context) {
 	}
 
 	user := models.User{
+		Username:    SignupInput.Username,
 		Email:       SignupInput.Email,
 		Password:    string(hashedPassword),
 		PhoneNumber: SignupInput.PhoneNumber,
-		FirstName:   SignupInput.FirstName,
-		LastName:    SignupInput.LastName,
+		Location:    SignupInput.Location,
 		Role:        SignupInput.Role,
 	}
 
@@ -62,6 +62,34 @@ func SignUp(c *gin.Context) {
 		log.Printf("Could not create user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create user"})
 		return
+	}
+
+	// Create associated Farmer or Retailer record based on role
+	if SignupInput.Role == "farmer" {
+		farmer := models.Farmer{
+			ID: user.ID,
+
+			Name:        user.Username,
+			PhoneNumber: SignupInput.PhoneNumber,
+			Location:    SignupInput.Location,
+		}
+		if err := db.Create(&farmer).Error; err != nil {
+			log.Printf("Could not create farmer: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create farmer"})
+			return
+		}
+	} else if SignupInput.Role == "retailer" {
+		retailer := models.Retailer{
+			ID:          user.ID,
+			Name:        user.Username,
+			PhoneNumber: SignupInput.PhoneNumber,
+			Location:    SignupInput.Location,
+		}
+		if err := db.Create(&retailer).Error; err != nil {
+			log.Printf("Could not create retailer: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create retailer"})
+			return
+		}
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
@@ -145,10 +173,26 @@ func UpdateUserProfile(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
-	if err := c.ShouldBindJSON(&user); err != nil {
+
+	var updateUserInput struct {
+		Username    string `json:"username"`
+		PhoneNumber string `json:"phoneNumber"`
+		Location    string `json:"location"`
+	}
+
+	if err := c.ShouldBindJSON(&updateUserInput); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
 		return
 	}
-	db.Save(&user)
+
+	user.Username = updateUserInput.Username
+	user.PhoneNumber = updateUserInput.PhoneNumber
+	user.Location = updateUserInput.Location
+
+	if err := db.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user profile"})
+		return
+	}
+
 	c.JSON(http.StatusOK, user)
 }
