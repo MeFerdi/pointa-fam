@@ -62,6 +62,7 @@ async function handleSignUp(event) {
     if (response.ok) {
         localStorage.setItem('token', result.token);
         localStorage.setItem('userID', result.userID);
+        localStorage.setItem('role', result.role);
         window.location.href = result.role === 'farmer' ? '/farmer/dashboard' : '/retailer/dashboard';
     } else {
         document.getElementById('signup-result').innerText = result.message;
