@@ -16,7 +16,7 @@ func SetupRoutes(r *gin.Engine) {
 	r.POST("/api/products", controllers.CreateProduct)
 	r.PUT("/api/products/:id", controllers.UpdateProduct)
 	r.DELETE("/api/products/:id", controllers.DeleteProduct)
-
+	r.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
 	// Retailer Routes
 	r.GET("/api/retailers", controllers.GetRetailers)
 
