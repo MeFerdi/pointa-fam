@@ -153,7 +153,7 @@ func main() {
 
 		api.GET("/products/:id", controllers.GetProductByID)
 		api.GET("/user/:id/products", controllers.GetProductsByUser)
-
+		api.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
 		api.POST("/products", controllers.CreateProduct)
 		api.PUT("/products/:id", controllers.UpdateProduct)
 		api.DELETE("/products/:id", controllers.DeleteProduct)
