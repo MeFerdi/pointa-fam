@@ -128,21 +128,13 @@ async function loadUserProfile() {
         });
         if (response.ok) {
             const user = await response.json();
-            console.log('User profile:', user); // Debugging statement
-
-            const userUsernameElement = document.getElementById('user-username');
-            const userEmailElement = document.getElementById('user-email');
-            const userLocationElement = document.getElementById('user-location');
-            const editUsernameElement = document.getElementById('edit-username');
-            const editEmailElement = document.getElementById('edit-email');
-            const editLocationElement = document.getElementById('edit-location');
-
-            if (userUsernameElement) userUsernameElement.innerText = user.username;
-            if (userEmailElement) userEmailElement.innerText = user.email;
-            if (userLocationElement) userLocationElement.innerText = `Location: ${user.location}`;
-            if (editUsernameElement) editUsernameElement.value = user.username;
-            if (editEmailElement) editEmailElement.value = user.email;
-            if (editLocationElement) editLocationElement.value = user.location;
+            document.getElementById('user-username').innerText = user.username;
+            document.getElementById('user-email').innerText = user.email;
+            document.getElementById('user-location').innerText = `Location: ${user.location}`;
+            document.getElementById('profile-picture').src = user.profilePictureUrl;
+            document.getElementById('edit-username').value = user.username;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-location').value = user.location;
         } else {
             console.error('Failed to load user profile');
         }
@@ -151,24 +143,51 @@ async function loadUserProfile() {
     }
 }
 function toggleDropdown(id) {
-    document.getElementById(id).classList.toggle('hidden');
+    const element = document.getElementById(id);
+    if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+    } else {
+        element.classList.add('hidden');
+    }
 }
+async function uploadProfilePicture(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    const userID = localStorage.getItem('userID');
+    const token = localStorage.getItem('token');
+
+    const response = await fetch(`/api/user/${userID}/profile-picture`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        document.getElementById('profile-picture').src = data.profilePictureUrl;
+    } else {
+        alert('Failed to upload profile picture');
+    }
+}
 async function handleProfileUpdate(event) {
     event.preventDefault();
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
     const form = event.target;
     const formData = new FormData(form);
-    const jsonData = Object.fromEntries(formData.entries());
 
     const response = await fetch(`/api/user/${userID}`, {
         method: 'PUT',
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(jsonData)
+        body: formData
     });
 
     if (response.ok) {
@@ -180,7 +199,6 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
-
 async function loadProducts(category = '') {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products?category=${category}`, {
