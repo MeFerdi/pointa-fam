@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"path/filepath"
 	"pointafam/backend/models"
 	"strconv"
 	"time"
@@ -188,6 +189,19 @@ func UpdateUserProfile(c *gin.Context) {
 	user.Username = updateUserInput.Username
 	user.PhoneNumber = updateUserInput.PhoneNumber
 	user.Location = updateUserInput.Location
+
+	// Handle profile picture upload
+	file, err := c.FormFile("profile_picture")
+	if err == nil {
+		// Save the file to the server
+		filename := filepath.Base(file.Filename)
+		filepath := filepath.Join("uploads", filename)
+		if err := c.SaveUploadedFile(file, filepath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to upload profile picture"})
+			return
+		}
+		user.ProfilePictureUrl = "/" + filepath
+	}
 
 	if err := db.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to update user profile"})
