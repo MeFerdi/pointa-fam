@@ -5,153 +5,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Farmer Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #2d3748;
+            color: white;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .header, .footer {
+            background-color: #2d3748;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex">
-    <script src="/public/script/script.js"></script>
-    <div class="header">
+<body class="bg-gray-100">
+    <!-- Header -->
+    <div class="header fixed top-0 left-0 right-0 z-10 flex items-center justify-between">
         <a href="/">
-            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
+            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-10">
         </a>
-    </div>
-    <!-- Sidebar -->
-    <div class="w-1/4 bg-white p-6 shadow-md">
-        <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-        <ul>
-            <li class="mb-4"><a href="#overview" class="text-blue-500 hover:underline">Overview</a></li>
-            <li class="mb-4"><a href="javascript:void(0);" class="text-blue-500 hover:underline" onclick="toggleDropdown('add-product-form')">Add New Product</a></li>
-            <li class="mb-4"><a href="#inventory-tracking" class="text-blue-500 hover:underline">Inventory Tracking</a></li>
-            <li class="mb-4"><a href="#view-orders" class="text-blue-500 hover:underline">View Orders</a></li>
-            <li class="mb-4"><a href="#manage-profile" class="text-blue-500 hover:underline">Manage Profile</a></li>
-            <li class="mb-4"><a href="#my-products" class="text-blue-500 hover:underline">My Products</a></li>
-        </ul>
+        <h1 class="text-xl font-bold mx-auto">Farmer Dashboard</h1>
+        <div class="w-10"></div> <!-- Placeholder to balance the logo on the left -->
     </div>
 
-    <!-- Main Content -->
-    <div class="w-3/4 p-6">
-        <h1 class="text-3xl font-bold mb-6 text-center">Farmer Dashboard</h1>
-
-        <!-- Overview Section -->
-        <div id="overview" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">Overview</h2>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">Total Sales</h3>
-                    <p class="text-gray-600">$10,000</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">Recent Orders</h3>
-                    <p class="text-gray-600">5 new orders</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">Inventory Levels</h3>
-                    <p class="text-gray-600">20 items in stock</p>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-md">
-                    <h3 class="text-xl font-bold mb-2">Notifications</h3>
-                    <p class="text-gray-600">2 new messages</p>
-                </div>
-            </div>
+    <!-- Content -->
+    <div class="content mt-16">
+        <!-- Sidebar -->
+        <div class="sidebar p-6 shadow-md">
+            <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+            <ul>
+                <li class="mb-4"><a href="#overview" class="text-blue-300 hover:underline">Overview</a></li>
+                <li class="mb-4"><a href="javascript:void(0);" class="text-blue-300 hover:underline" onclick="toggleDropdown('add-product-form')">Add New Product</a></li>
+                <li class="mb-4"><a href="#inventory-tracking" class="text-blue-300 hover:underline">Inventory Tracking</a></li>
+                <li class="mb-4"><a href="#view-orders" class="text-blue-300 hover:underline">View Orders</a></li>
+                <li class="mb-4"><a href="#manage-profile" class="text-blue-300 hover:underline">Manage Profile</a></li>
+                <li class="mb-4"><a href="#my-products" class="text-blue-300 hover:underline">My Products</a></li>
+            </ul>
         </div>
 
-        <!-- Add New Product Section -->
-        <div id="add-product" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
-            <div id="add-product-form" class="hidden">
-                <form id="create-product-form" onsubmit="handleFormSubmit(event, '/api/products', 'POST')" enctype="multipart/form-data">
-                    <input type="hidden" name="id">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Overview Section -->
+            <div id="overview" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">Overview</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Total Sales</h3>
+                        <p class="text-gray-600">$10,000</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Recent Orders</h3>
+                        <p class="text-gray-600">5 new orders</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Inventory Levels</h3>
+                        <p class="text-gray-600">20 items in stock</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Notifications</h3>
+                        <p class="text-gray-600">2 new messages</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Product Section -->
+            <div id="add-product" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">Add New Product</h2>
+                <div id="add-product-form" class="hidden">
+                    <form id="create-product-form" onsubmit="handleFormSubmit(event, '/api/products', 'POST')" enctype="multipart/form-data">
+                        <input type="hidden" name="id">
+                        <div class="mb-4">
+                            <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
+                        </div>
+                        <div class="mb-4">
+                            <input type="number" step="0.01" name="price" placeholder="Product Price" class="border p-2 w-full rounded" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="number" name="quantity" placeholder="Product Quantity" class="border p-2 w-full rounded" required>
+                        </div>
+                        <div class="mb-4">
+                            <input type="file" name="image" class="border p-2 w-full rounded">
+                        </div>
+                        <div class="mb-4">
+                            <select name="category" class="border p-2 w-full rounded" required>
+                                <option value="">Select Category</option>
+                                <option value="fruits">Fruits</option>
+                                <option value="vegetables">Vegetables</option>
+                                <option value="dairy">Dairy</option>
+                                <option value="meat">Meat</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <input type="checkbox" name="availability" class="mr-2"> Available
+                        </div>
+                        <div class="mb-4">
+                            <input type="number" name="farm_id" placeholder="Farm ID" class="border p-2 w-full rounded">
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Add Product</button>
+                    </form>
+                </div>
+                <div id="products-list">
+                    <!-- Products will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- My Products Section -->
+            <div id="my-products" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">My Products</h2>
+                <div id="my-products-list">
+                    <!-- My products will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Inventory Tracking Section -->
+            <div id="inventory-tracking" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">Inventory Tracking</h2>
+                <div id="inventory-list">
+                    <!-- Inventory will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- View Orders Section -->
+            <div id="view-orders" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">View Orders</h2>
+                <div id="orders-list">
+                    <!-- Orders will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Manage Profile Section -->
+            <div id="manage-profile" class="mb-6">
+                <h2 class="text-2xl font-bold mb-4">Manage Profile</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="relative">
+                            <img id="profile-picture" src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4 cursor-pointer" onclick="document.getElementById('profile-picture-input').click()">
+                            <input type="file" id="profile-picture-input" class="hidden" onchange="uploadProfilePicture(event)">
+                        </div>
+                        <div>
+                            <p id="user-username" class="text-lg font-bold">Loading...</p>
+                            <p id="user-email" class="text-gray-600">Loading...</p>
+                            <p id="user-location" class="text-gray-600">Loading...</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleDropdown('edit-profile-form')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
+                    <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-4">Logout</button>
+                </div>
+            </div>
+
+            <!-- Edit Profile Form -->
+            <div id="edit-profile-form" class="hidden">
+                <form id="update-profile-form" onsubmit="handleProfileUpdate(event)">
                     <div class="mb-4">
-                        <input type="text" name="name" placeholder="Product Name" class="border p-2 w-full rounded" required>
+                        <input type="text" id="edit-username" name="username" placeholder="Username" class="border p-2 w-full rounded" required>
                     </div>
                     <div class="mb-4">
-                        <input type="text" name="description" placeholder="Product Description" class="border p-2 w-full rounded">
+                        <input type="email" id="edit-email" name="email" placeholder="Email" class="border p-2 w-full rounded" required>
                     </div>
                     <div class="mb-4">
-                        <input type="number" step="0.01" name="price" placeholder="Product Price" class="border p-2 w-full rounded" required>
+                        <input type="text" id="edit-location" name="location" placeholder="Location" class="border p-2 w-full rounded" required>
                     </div>
-                    <div class="mb-4">
-                        <input type="number" name="quantity" placeholder="Product Quantity" class="border p-2 w-full rounded" required>
-                    </div>
-                    <div class="mb-4">
-                        <input type="file" name="image" class="border p-2 w-full rounded">
-                    </div>
-                    <div class="mb-4">
-                        <select name="category" class="border p-2 w-full rounded" required>
-                            <option value="">Select Category</option>
-                            <option value="fruits">Fruits</option>
-                            <option value="vegetables">Vegetables</option>
-                            <option value="dairy">Dairy</option>
-                            <option value="meat">Meat</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <input type="checkbox" name="availability" class="mr-2"> Available
-                    </div>
-                    <div class="mb-4">
-                        <input type="number" name="farm_id" placeholder="Farm ID" class="border p-2 w-full rounded">
-                    </div>
-                    <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Add Product</button>
+                    <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Update Profile</button>
                 </form>
             </div>
-            <div id="products-list">
-                <!-- Products will be loaded here dynamically -->
-            </div>
         </div>
-
-        <!-- My Products Section -->
-        <div id="my-products" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">My Products</h2>
-            <div id="my-products-list">
-                <!-- My products will be loaded here dynamically -->
-            </div>
-        </div>
-
-        <!-- Inventory Tracking Section -->
-        <div id="inventory-tracking" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">Inventory Tracking</h2>
-            <div id="inventory-list">
-                <!-- Inventory will be loaded here dynamically -->
-            </div>
-        </div>
-
-        <!-- View Orders Section -->
-        <div id="view-orders" class="mb-6">
-            <h2 class="text-2xl font-bold mb-4">View Orders</h2>
-            <div id="orders-list">
-                <!-- Orders will be loaded here dynamically -->
-            </div>
-        </div>
-
-        <!-- Manage Profile Section -->
-<div id="manage-profile" class="mb-6">
-    <h2 class="text-2xl font-bold mb-4">Manage Profile</h2>
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <div class="flex items-center mb-4">
-            <img src="profile_picture_url" alt="Profile Picture" class="w-16 h-16 rounded-full mr-4">
-            <div>
-                <p id="user-username" class="text-lg font-bold">Loading...</p>
-                <p id="user-email" class="text-gray-600">Loading...</p>
-                <p id="user-location" class="text-gray-600">Loading...</p>
-            </div>
-        </div>
-        <button onclick="toggleDropdown('edit-profile-form')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Edit Profile</button>
-        <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-4">Logout</button>
     </div>
-</div>
 
-<!-- Edit Profile Form -->
-<div id="edit-profile-form" class="hidden">
-    <form id="update-profile-form" onsubmit="handleProfileUpdate(event)">
-        <div class="mb-4">
-            <input type="text" id="edit-username" name="username" placeholder="Username" class="border p-2 w-full rounded" required>
-        </div>
-        <div class="mb-4">
-            <input type="email" id="edit-email" name="email" placeholder="Email" class="border p-2 w-full rounded" required>
-        </div>
-        <div class="mb-4">
-            <input type="text" id="edit-location" name="location" placeholder="Location" class="border p-2 w-full rounded" required>
-        </div>
-        <button type="submit" class="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition duration-200">Update Profile</button>
-    </form>
-</div>
+    <!-- Footer -->
+    <div class="footer fixed bottom-0 left-0 right-0 z-10">
+        <p>&copy; 2025 PointaFam. All rights reserved.</p>
+    </div>
+    <script src="/public/script/script.js"></script>
 </body>
 </html>
