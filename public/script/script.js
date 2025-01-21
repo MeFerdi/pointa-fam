@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadUserProfile();
     loadProducts();
     loadCart();
+    loadMyProducts(); // Ensure this is called to load user-specific products
 });
 
 async function loadUserProfile() {
@@ -142,6 +143,7 @@ async function loadUserProfile() {
         console.error('User ID or token not found');
     }
 }
+
 function toggleDropdown(id) {
     const element = document.getElementById(id);
     if (element.classList.contains('hidden')) {
@@ -150,6 +152,7 @@ function toggleDropdown(id) {
         element.classList.add('hidden');
     }
 }
+
 async function uploadProfilePicture(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -175,6 +178,7 @@ async function uploadProfilePicture(event) {
         alert('Failed to upload profile picture');
     }
 }
+
 async function handleProfileUpdate(event) {
     event.preventDefault();
     const userID = localStorage.getItem('userID');
@@ -199,6 +203,7 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
+
 async function loadProducts(category = '') {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products?category=${category}`, {
@@ -301,6 +306,10 @@ async function handleFormSubmit(event, url, method) {
     const form = event.target;
     const formData = new FormData(form);
     const token = localStorage.getItem('token');
+    const userID = localStorage.getItem('userID');
+
+    // Ensure userID is included in the form data
+    formData.append('userID', userID);
 
     const response = await fetch(url, {
         method: method,
@@ -330,6 +339,10 @@ async function loadMyProducts() {
             'Authorization': `Bearer ${token}`
         }
     });
+    if (!response.ok) {
+        console.error('Failed to fetch user products');
+        return;
+    }
     const products = await response.json();
     const myProductsList = document.getElementById('my-products-list');
     myProductsList.innerHTML = products.map(product => `
