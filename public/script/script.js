@@ -45,36 +45,67 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function handleSignUp(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the form from submitting the traditional way
+
+    // Get form data
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
+    try {
+        // Send the signup request to the backend
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
-    const result = await response.json();
-    if (response.ok) {
-        localStorage.setItem('token', result.token);
-        localStorage.setItem('userID', result.userID);
-        localStorage.setItem('role', result.role);
-        window.location.href = result.role === 'farmer' ? '/farmer/dashboard' : '/retailer/dashboard';
-    } else {
-        document.getElementById('signup-result').innerText = result.message;
+        // Parse the response
+        const result = await response.json();
+
+        // Check if the request was successful
+        if (response.ok) {
+            // Save token and user details in localStorage
+            localStorage.setItem('token', result.token);
+            localStorage.setItem('userID', result.userID);
+            localStorage.setItem('role', result.role);
+
+            // Redirect based on the user's role
+            if (result.role === 'farmer') {
+                window.location.href = '/farmer/dashboard';
+            } else if (result.role === 'retailer') {
+                window.location.href = '/retailer/dashboard';
+            } else {
+                console.error('Unknown role:', result.role);
+                alert('Unknown role. Please contact support.');
+            }
+        } else {
+            // Display error message if the request failed
+            document.getElementById('signup-result').innerText = result.message || 'Signup failed. Please try again.';
+        }
+    } catch (error) {
+        // Handle network or other errors
+        console.error('Error during signup:', error);
+        document.getElementById('signup-result').innerText = 'An error occurred. Please try again.';
     }
 }
 
 function redirectToDashboard() {
+    // Get the user's role from localStorage
     const role = localStorage.getItem('role');
+
+    // Redirect based on the role
     if (role === 'farmer') {
         window.location.href = '/farmer/dashboard';
     } else if (role === 'retailer') {
         window.location.href = '/retailer/dashboard';
+    } else {
+        // Handle unknown or missing role
+        console.error('Unknown or missing role:', role);
+        alert('You are not logged in or your role is unknown. Please log in.');
+        window.location.href = '/login'; // Redirect to login page
     }
 }
 
@@ -229,77 +260,161 @@ async function loadProductsByCategory(category, containerId) {
         container.innerHTML = `<p class="text-red-500">Failed to load ${category} products. Please try again later.</p>`;
     }
 }
+// Load cart items
 async function loadCart() {
-    const userID = localStorage.getItem('userID');
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/cart/${userID}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
+    try {
+        const response = await fetch('/api/cart', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to load cart');
         }
-    });
-    if (response.status === 500) {
-        alert('Error loading cart. Please try again later.');
-        return;
+
+        const cart = await response.json();
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+
+        // Clear existing items
+        cartItemsContainer.innerHTML = '';
+
+        // Render cart items
+        let total = 0;
+        cart.items.forEach(item => {
+            const itemTotal = item.product.price * item.quantity;
+            total += itemTotal;
+
+            cartItemsContainer.innerHTML += `
+                <div class="cart-item bg-white p-4 rounded-lg shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold">${item.product.name}</h3>
+                            <p class="text-gray-600">$${item.product.price} x ${item.quantity}</p>
+                            <p class="text-gray-800 font-bold">$${itemTotal.toFixed(2)}</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" class="w-16 p-2 border rounded">
+                            <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Update total
+        cartTotal.textContent = total.toFixed(2);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to load cart. Please try again.');
     }
-    const cartItems = await response.json();
-    const cartList = document.getElementById('cart-list');
-    cartList.innerHTML = cartItems.length === 0 ? '<p class="text-center text-gray-600">Cart empty</p>' : cartItems.map(item => `
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold mb-2">${item.product.name}</h3>
-            <p class="text-gray-600">${item.product.description}</p>
-            <p class="text-gray-600">$${item.product.price}</p>
-            <p class="text-gray-600">${item.quantity} in cart</p>
-            <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">Remove</button>
-        </div>
-    `).join('');
 }
 
-async function addToCart(productId) {
-    const userID = localStorage.getItem('userID');
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/cart', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ productId: productId, userID: parseInt(userID), quantity: 1 })
-    });
+// Update cart item quantity
+async function updateQuantity(itemId, quantity) {
+    try {
+        const response = await fetch(`/api/cart/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity: parseInt(quantity) }),
+        });
 
-    if (response.ok) {
-        alert('Product added to cart');
-        loadCart();
-    } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
-    }
-}
-
-async function removeFromCart(cartItemId) {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/cart/${cartItemId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
+        if (!response.ok) {
+            throw new Error('Failed to update quantity');
         }
-    });
 
-    if (response.ok) {
-        alert('Product removed from cart');
-        loadCart();
-    } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
+        const data = await response.json();
+        loadCart(); // Refresh the cart list
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update quantity. Please try again.');
     }
 }
 
+// Remove item from cart
+async function removeFromCart(itemId) {
+    try {
+        const response = await fetch(`/api/cart/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to remove item from cart');
+        }
+
+        const data = await response.json();
+        loadCart(); // Refresh the cart list
+        updateCartCount(); // Update cart count in the header
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to remove item from cart. Please try again.');
+    }
+}
+
+// Update cart count in the header
+async function updateCartCount() {
+    try {
+        const response = await fetch('/api/cart/count', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch cart count');
+        }
+
+        const data = await response.json();
+        document.getElementById('cart-count').textContent = data.count;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Show cart modal
 function showCart() {
     document.getElementById('cart-modal').classList.remove('hidden');
+    loadCart(); // Load cart items when the modal is opened
 }
 
+// Hide cart modal
 function hideCart() {
     document.getElementById('cart-modal').classList.add('hidden');
 }
+
+// Handle checkout
+async function checkout() {
+    try {
+        const response = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to checkout');
+        }
+
+        const data = await response.json();
+        alert('Checkout successful!');
+        hideCart(); // Close the cart modal
+        updateCartCount(); // Update cart count in the header
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to checkout. Please try again.');
+    }
+}
+
 
 async function handleFormSubmit(event, url, method) {
     event.preventDefault();
