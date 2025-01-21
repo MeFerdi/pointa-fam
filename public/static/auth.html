@@ -10,6 +10,8 @@
         .layout-container {
             display: flex;
             height: 100vh; /* Full viewport height */
+            padding-top: 64px; /* Header height */
+            padding-bottom: 64px; /* Footer height */
         }
 
         /* Image container (left side) */
@@ -45,9 +47,53 @@
             align-items: center;
             padding: 2rem;
         }
+
+        /* Fixed header */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Fixed footer */
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background-color: #4CAF50; /* Green color */
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- Fixed Header -->
+    <header class="fixed-header">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <a href="/">
+                <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
+            </a>
+            <nav id="user-account" class="space-x-4">
+                <button onclick="window.location.href='/about'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    About Us
+                </button>
+                <button onclick="window.location.href='/contact'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    Contact Us
+                </button>
+                <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    Login
+                </button>
+            </nav>
+        </div>
+    </header>
+
     <!-- Layout Container -->
     <div class="layout-container">
         <!-- Image Container (Left Side) -->
@@ -96,20 +142,30 @@
         </div>
     </div>
 
+    <!-- Fixed Footer -->
+    <footer class="fixed-footer">
+        <div class="container mx-auto text-center">
+            &copy; 2025 PointaFam. All rights reserved.
+        </div>
+    </footer>
+
     <script>
-        // image transition
+        // JavaScript to handle image transitions
         const images = document.querySelectorAll('.image-container img');
         let currentImageIndex = 0;
 
         function showNextImage() {
-
+            // Hide the current image
             images[currentImageIndex].style.opacity = 0;
 
+            // Move to the next image
             currentImageIndex = (currentImageIndex + 1) % images.length;
 
+            // Show the next image
             images[currentImageIndex].style.opacity = 1;
         }
 
+        // Change image every 5 seconds
         setInterval(showNextImage, 5000);
     </script>
 </body>
