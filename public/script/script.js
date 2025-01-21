@@ -203,32 +203,32 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
-
-async function loadProducts(category = '') {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/products?category=${category}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
+async function loadProductsByCategory(category, containerId) {
+    try {
+        const response = await fetch(`/api/products/category?category=${category}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${category} products`);
         }
-    });
-    if (response.status === 401) {
-        alert('Unauthorized. Please log in again.');
-        window.location.href = '/login';
-        return;
+        console.log(response)
+        const products = await response.json();
+        const container = document.getElementById(containerId);
+        container.innerHTML = products.map(product => `
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
+                <img src="${product.imageURL}" alt="${product.name}" class="w-full h-60 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold">${product.name}</h3>
+                    <p>${product.description}</p>
+                    <p class="text-gray-600">$${product.price}</p>
+                    <button onclick="window.location.href='/product/${product.id}'" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">View Details</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error(error);
+        const container = document.getElementById(containerId);
+        container.innerHTML = `<p class="text-red-500">Failed to load ${category} products. Please try again later.</p>`;
     }
-    const products = await response.json();
-    const productsList = document.getElementById('products-list');
-    productsList.innerHTML = products.map(product => `
-        <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
-            <p class="text-gray-600">${product.description}</p>
-            <p class="text-gray-600">$${product.price}</p>
-            <p class="text-gray-600">${product.quantity} in stock</p>
-            <button onclick="addToCart(${product.id})" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Add to Cart</button>
-        </div>
-    `).join('');
 }
-
 async function loadCart() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
