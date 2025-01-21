@@ -149,19 +149,21 @@ func main() {
 	{
 		api.GET("/user/:id", controllers.GetUserProfile)
 		api.PUT("/user/:id", controllers.UpdateUserProfile)
-		api.DELETE("/user/:id", controllers.DeleteUser)
+		// api.DELETE("/user/:id", controllers.DeleteUser)
 
-		api.GET("/products/:id", controllers.GetProductByID)
-		api.GET("/user/:id/products", controllers.GetProductsByUser)
+		// api.GET("/products/:id", controllers.GetProductByID)
+		api.GET("/api/products/category", controllers.GetProductsByCategory)
+		// api.GET("/user/:id/products", controllers.GetProductsByUser)
 		api.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
-		api.POST("/products", controllers.CreateProduct)
-		api.PUT("/products/:id", controllers.UpdateProduct)
-		api.DELETE("/products/:id", controllers.DeleteProduct)
-
-		api.POST("/cart", controllers.AddToCart)
-		api.GET("/cart/:retailer_id", controllers.ViewCart)
-		api.DELETE("/cart/:item_id", controllers.RemoveFromCart)
+		api.GET("/user/:id/profile-picture", controllers.GetProfilePicture)
 	}
+	api.POST("/products", controllers.CreateProduct)
+	api.PUT("/products/:id", controllers.UpdateProduct)
+	api.DELETE("/products/:id", controllers.DeleteProduct)
+
+	api.POST("/cart", controllers.AddToCart)
+	api.GET("/cart/:retailer_id", controllers.ViewCart)
+	api.DELETE("/cart/:item_id", controllers.RemoveFromCart)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
