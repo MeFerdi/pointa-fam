@@ -5,20 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Ensure the body takes up the full height of the viewport */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Make the main content scrollable */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 80px; /* Adjust based on header height */
+            padding-bottom: 60px; /* Adjust based on footer height */
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-    <div class="header flex justify-between items-center p-4 bg-white shadow-md">
-        <a href="/">
-            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
-        </a>
-        <div id="user-account" class="nav-buttons">
-            <button onclick="window.location.href='/about'">About Us</button>
-            <button onclick="window.location.href='/contact'">Contact Us</button>
-            <button onclick="window.location.href='/login'">Login</button>
+    <!-- Fixed Header -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+        <div class="container mx-auto flex justify-between items-center p-4">
+            <a href="/">
+                <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
+            </a>
+            <nav id="user-account" class="space-x-4">
+                <button onclick="window.location.href='/about'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    About Us
+                </button>
+                <button onclick="window.location.href='/contact'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    Contact Us
+                </button>
+                <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                    Login
+                </button>
+            </nav>
         </div>
-    </div>
+    </header>
 
-    <div class="container mx-auto mt-10 text-center">
+    <!-- Scrollable Main Content -->
+    <main class="main-content container mx-auto text-center">
         <h1 class="text-4xl font-bold mb-6">About PointaFam</h1>
         <p class="text-lg mb-6">At PointaFam, we believe in connecting farmers directly with consumers to provide fresh, organic produce while supporting local agriculture.</p>
 
@@ -39,6 +65,13 @@
 
         <h2 class="text-2xl font-bold mb-4">Join Us!</h2>
         <p>If you're a farmer or consumer interested in joining our community, please visit our Contact Us page for more information.</p>
-    </div>
+    </main>
+
+    <!-- Fixed Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-green-600 text-white py-4 z-50">
+        <div class="container mx-auto text-center">
+            &copy; 2025 PointaFam. All rights reserved.
+        </div>
+    </footer>
 </body>
 </html>
