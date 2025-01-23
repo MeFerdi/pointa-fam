@@ -5,22 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        /* Ensure the body takes up the full height of the viewport */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Make the main content scrollable */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-top: 80px; /* Adjust based on header height */
-            padding-bottom: 60px; /* Adjust based on footer height */
-        }
-    </style>
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-gray-100">
     <!-- Fixed Header -->
@@ -61,7 +46,13 @@
         <h2 class="text-2xl font-bold mb-4">Meet Our Team</h2>
         <p class="mb-6">Our dedicated team is passionate about agriculture and committed to making a positive impact in the community.</p>
 
-        <img src="/public/assets/team.jpg" alt="Our Team" class="w-full h-auto rounded-lg mb-6">
+        <div class="card">
+            <img src="/public/assets/team.jpg" alt="Our Team" class="w-24 h-24 rounded-full object-cover mx-auto mb-4">
+            <div class="text-center">
+                <h3 class="text-xl font-bold">Ferdynand Odhiambo</h3>
+                <p class="text-gray-600">Software Engineer</p>
+            </div>
+        </div>
 
         <h2 class="text-2xl font-bold mb-4">Join Us!</h2>
         <p>If you're a farmer or consumer interested in joining our community, please visit our Contact Us page for more information.</p>
@@ -73,5 +64,6 @@
             &copy; 2025 PointaFam. All rights reserved.
         </div>
     </footer>
+    <script src="/public/script/script.js"></script>
 </body>
 </html>

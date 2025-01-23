@@ -5,73 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        /* Container for the layout */
-        .layout-container {
-            display: flex;
-            height: 100vh; /* Full viewport height */
-            padding-top: 64px; /* Header height */
-            padding-bottom: 64px; /* Footer height */
-        }
-
-        /* Image container (left side) */
-        .image-container {
-            flex: 1; /* Takes up half of the page */
-            display: flex;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Individual image styling */
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        /* Show the first image by default */
-        .image-container img:first-child {
-            opacity: 1;
-        }
-
-        /* Form container (right side) */
-        .form-container {
-            flex: 1; /* Takes up the other half of the page */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        /* Fixed header */
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background-color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Fixed footer */
-        .fixed-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 50;
-            background-color: #4CAF50; /* Green color */
-            color: white;
-            text-align: center;
-            padding: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-gray-100">
     <!-- Fixed Header -->
@@ -148,25 +82,6 @@
             &copy; 2025 PointaFam. All rights reserved.
         </div>
     </footer>
-
-    <script>
-        // JavaScript to handle image transitions
-        const images = document.querySelectorAll('.image-container img');
-        let currentImageIndex = 0;
-
-        function showNextImage() {
-            // Hide the current image
-            images[currentImageIndex].style.opacity = 0;
-
-            // Move to the next image
-            currentImageIndex = (currentImageIndex + 1) % images.length;
-
-            // Show the next image
-            images[currentImageIndex].style.opacity = 1;
-        }
-
-        // Change image every 5 seconds
-        setInterval(showNextImage, 5000);
-    </script>
+    <script src="/public/script/script.js"></script>
 </body>
 </html>
