@@ -256,41 +256,63 @@ async function loadProductsByCategory(category, containerId) {
 async function loadCart() {
     try {
         const response = await fetch('/api/cart', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
         });
 
-        if (!response.ok) throw new Error('Failed to load cart');
+        if (!response.ok) {
+            throw new Error('Failed to load cart');
+        }
 
         const cart = await response.json();
+
         const cartItemsContainer = document.getElementById('cart-items');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
         const cartTotal = document.getElementById('cart-total');
 
+        // Clear existing items
         cartItemsContainer.innerHTML = '';
-        let total = 0;
 
+        if (cart.items.length === 0) {
+            // Show empty cart message
+            emptyCartMessage.classList.remove('hidden');
+            cartTotal.textContent = '0.00';
+            return;
+        }
+
+        // Hide empty cart message
+        emptyCartMessage.classList.add('hidden');
+
+        // Render cart items
+        let total = 0;
         cart.items.forEach(item => {
             const itemTotal = item.product.price * item.quantity;
             total += itemTotal;
 
-            cartItemsContainer.innerHTML += `
-                <div class="cart-item bg-white p-4 rounded-lg shadow-md">
-                    <div class="flex items-center justify-between">
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item bg-white p-4 rounded-lg shadow-md';
+            cartItem.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <img src="${item.product.imageURL}" alt="${item.product.name}" class="w-12 h-12 rounded-lg mr-4">
                         <div>
-                            <h3 class="text-xl font-bold">${item.product.name}</h3>
-                            <p class="text-gray-600">$${item.product.price} x ${item.quantity}</p>
-                            <p class="text-gray-800 font-bold">$${itemTotal.toFixed(2)}</p>
+                            <h3 class="text-lg font-semibold">${item.product.name}</h3>
+                            <p class="text-gray-600">Quantity: ${item.quantity}</p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <input type="number" min="1" value="${item.quantity}" onchange="updateQuantity(${item.id}, this.value)" class="w-16 p-2 border rounded">
-                            <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold">$${itemTotal.toFixed(2)}</p>
+                        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-600">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             `;
+            cartItemsContainer.appendChild(cartItem);
         });
 
+        // Update total
         cartTotal.textContent = total.toFixed(2);
     } catch (error) {
         console.error('Error:', error);
@@ -298,35 +320,21 @@ async function loadCart() {
     }
 }
 
-async function updateQuantity(itemId, quantity) {
-    try {
-        const response = await fetch(`/api/cart/${itemId}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantity: parseInt(quantity) }),
-        });
-
-        if (!response.ok) throw new Error('Failed to update quantity');
-        loadCart();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to update quantity. Please try again.');
-    }
-}
-
 async function removeFromCart(itemId) {
     try {
         const response = await fetch(`/api/cart/${itemId}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
         });
 
-        if (!response.ok) throw new Error('Failed to remove item from cart');
+        if (!response.ok) {
+            throw new Error('Failed to remove item from cart');
+        }
+
+        // Reload the cart after removing an item
         loadCart();
-        updateCartCount();
     } catch (error) {
         console.error('Error:', error);
         alert('Failed to remove item from cart. Please try again.');
@@ -338,7 +346,7 @@ async function updateCartCount() {
         const response = await fetch('/api/cart/count', {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
-
+        
         if (!response.ok) throw new Error('Failed to fetch cart count');
         const data = await response.json();
         document.getElementById('cart-count').textContent = data.count;
@@ -357,6 +365,24 @@ function hideCart() {
 }
 
 async function checkout() {
+    async function updateQuantity(itemId, quantity) {
+        try {
+            const response = await fetch(`/api/cart/${itemId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: parseInt(quantity) }),
+            });
+    
+            if (!response.ok) throw new Error('Failed to update quantity');
+            loadCart();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to update quantity. Please try again.');
+        }
+    }
     try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
