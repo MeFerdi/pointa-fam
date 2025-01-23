@@ -159,6 +159,7 @@ body {
 
 /* Sidebar styling */
 .sidebar {
+    position: fixed;
     width: 250px;
     background-color: #4caf50;
     color: white;
