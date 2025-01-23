@@ -1,7 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    initializePage();
+    loadUserProfile();
+    loadProducts();
+    loadCart();
+    loadMyProducts();
+});
+
+function initializePage() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
 
     if (userID && token) {
         document.getElementById('user-account').innerHTML = `
@@ -10,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    startTypingAnimation();
+}
+
+function startTypingAnimation() {
     const messages = ["Welcome to PointaFam", "Connecting farmers with consumers"];
     let currentMessageIndex = 0;
     let currentCharIndex = 0;
@@ -42,70 +53,72 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     type();
-});
+}
 
 async function handleSignUp(event) {
-    event.preventDefault(); // Prevent the form from submitting the traditional way
-
-    // Get form data
+    event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
     try {
-        // Send the signup request to the backend
         const response = await fetch('/api/register', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
         });
 
-        // Parse the response
         const result = await response.json();
 
-        // Check if the request was successful
         if (response.ok) {
-            // Save token and user details in localStorage
             localStorage.setItem('token', result.token);
             localStorage.setItem('userID', result.userID);
             localStorage.setItem('role', result.role);
-
-            // Redirect based on the user's role
-            if (result.role === 'farmer') {
-                window.location.href = '/farmer/dashboard';
-            } else if (result.role === 'retailer') {
-                window.location.href = '/retailer/dashboard';
-            } else {
-                console.error('Unknown role:', result.role);
-                alert('Unknown role. Please contact support.');
-            }
+            redirectToDashboard(result.role);
         } else {
-            // Display error message if the request failed
             document.getElementById('signup-result').innerText = result.message || 'Signup failed. Please try again.';
         }
     } catch (error) {
-        // Handle network or other errors
         console.error('Error during signup:', error);
         document.getElementById('signup-result').innerText = 'An error occurred. Please try again.';
     }
 }
 
-function redirectToDashboard() {
-    // Get the user's role from localStorage
-    const role = localStorage.getItem('role');
+async function handleLogin(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
 
-    // Redirect based on the role
+    const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email: formData.get('email'),
+            password: formData.get('password')
+        })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('userID', data.userID);
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+        redirectToDashboard(data.role);
+    } else {
+        const error = await response.json();
+        document.getElementById('login-result').innerText = `Error: ${error.error}`;
+    }
+}
+
+function redirectToDashboard(role) {
     if (role === 'farmer') {
         window.location.href = '/farmer/dashboard';
     } else if (role === 'retailer') {
         window.location.href = '/retailer/dashboard';
     } else {
-        // Handle unknown or missing role
         console.error('Unknown or missing role:', role);
         alert('You are not logged in or your role is unknown. Please log in.');
-        window.location.href = '/login'; // Redirect to login page
+        window.location.href = '/login';
     }
 }
 
@@ -124,9 +137,7 @@ function subscribe() {
     if (email) {
         fetch('/subscribe', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email })
         })
         .then(response => response.json())
@@ -142,21 +153,12 @@ function subscribe() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadUserProfile();
-    loadProducts();
-    loadCart();
-    loadMyProducts(); // Ensure this is called to load user-specific products
-});
-
 async function loadUserProfile() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
     if (userID && token) {
         const response = await fetch(`/api/user/${userID}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {
             const user = await response.json();
@@ -177,11 +179,7 @@ async function loadUserProfile() {
 
 function toggleDropdown(id) {
     const element = document.getElementById(id);
-    if (element.classList.contains('hidden')) {
-        element.classList.remove('hidden');
-    } else {
-        element.classList.add('hidden');
-    }
+    element.classList.toggle('hidden');
 }
 
 async function uploadProfilePicture(event) {
@@ -196,9 +194,7 @@ async function uploadProfilePicture(event) {
 
     const response = await fetch(`/api/user/${userID}/profile-picture`, {
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
     });
 
@@ -219,9 +215,7 @@ async function handleProfileUpdate(event) {
 
     const response = await fetch(`/api/user/${userID}`, {
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
     });
 
@@ -234,13 +228,11 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
+
 async function loadProductsByCategory(category, containerId) {
     try {
         const response = await fetch(`/api/products/category?category=${category}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch ${category} products`);
-        }
-        console.log(response)
+        if (!response.ok) throw new Error(`Failed to fetch ${category} products`);
         const products = await response.json();
         const container = document.getElementById(containerId);
         container.innerHTML = products.map(product => `
@@ -260,28 +252,22 @@ async function loadProductsByCategory(category, containerId) {
         container.innerHTML = `<p class="text-red-500">Failed to load ${category} products. Please try again later.</p>`;
     }
 }
-// Load cart items
+
 async function loadCart() {
     try {
         const response = await fetch('/api/cart', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to load cart');
-        }
+        if (!response.ok) throw new Error('Failed to load cart');
 
         const cart = await response.json();
         const cartItemsContainer = document.getElementById('cart-items');
         const cartTotal = document.getElementById('cart-total');
 
-        // Clear existing items
         cartItemsContainer.innerHTML = '';
-
-        // Render cart items
         let total = 0;
+
         cart.items.forEach(item => {
             const itemTotal = item.product.price * item.quantity;
             total += itemTotal;
@@ -305,7 +291,6 @@ async function loadCart() {
             `;
         });
 
-        // Update total
         cartTotal.textContent = total.toFixed(2);
     } catch (error) {
         console.error('Error:', error);
@@ -313,7 +298,6 @@ async function loadCart() {
     }
 }
 
-// Update cart item quantity
 async function updateQuantity(itemId, quantity) {
     try {
         const response = await fetch(`/api/cart/${itemId}`, {
@@ -325,54 +309,37 @@ async function updateQuantity(itemId, quantity) {
             body: JSON.stringify({ quantity: parseInt(quantity) }),
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to update quantity');
-        }
-
-        const data = await response.json();
-        loadCart(); // Refresh the cart list
+        if (!response.ok) throw new Error('Failed to update quantity');
+        loadCart();
     } catch (error) {
         console.error('Error:', error);
         alert('Failed to update quantity. Please try again.');
     }
 }
 
-// Remove item from cart
 async function removeFromCart(itemId) {
     try {
         const response = await fetch(`/api/cart/${itemId}`, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to remove item from cart');
-        }
-
-        const data = await response.json();
-        loadCart(); // Refresh the cart list
-        updateCartCount(); // Update cart count in the header
+        if (!response.ok) throw new Error('Failed to remove item from cart');
+        loadCart();
+        updateCartCount();
     } catch (error) {
         console.error('Error:', error);
         alert('Failed to remove item from cart. Please try again.');
     }
 }
 
-// Update cart count in the header
 async function updateCartCount() {
     try {
         const response = await fetch('/api/cart/count', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch cart count');
-        }
-
+        if (!response.ok) throw new Error('Failed to fetch cart count');
         const data = await response.json();
         document.getElementById('cart-count').textContent = data.count;
     } catch (error) {
@@ -380,41 +347,31 @@ async function updateCartCount() {
     }
 }
 
-// Show cart modal
 function showCart() {
     document.getElementById('cart-modal').classList.remove('hidden');
-    loadCart(); // Load cart items when the modal is opened
+    loadCart();
 }
 
-// Hide cart modal
 function hideCart() {
     document.getElementById('cart-modal').classList.add('hidden');
 }
 
-// Handle checkout
 async function checkout() {
     try {
         const response = await fetch('/api/checkout', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
 
-        if (!response.ok) {
-            throw new Error('Failed to checkout');
-        }
-
-        const data = await response.json();
+        if (!response.ok) throw new Error('Failed to checkout');
         alert('Checkout successful!');
-        hideCart(); // Close the cart modal
-        updateCartCount(); // Update cart count in the header
+        hideCart();
+        updateCartCount();
     } catch (error) {
         console.error('Error:', error);
         alert('Failed to checkout. Please try again.');
     }
 }
-
 
 async function handleFormSubmit(event, url, method) {
     event.preventDefault();
@@ -423,14 +380,11 @@ async function handleFormSubmit(event, url, method) {
     const token = localStorage.getItem('token');
     const userID = localStorage.getItem('userID');
 
-    // Ensure userID is included in the form data
     formData.append('userID', userID);
 
     const response = await fetch(url, {
         method: method,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
     });
 
@@ -450,14 +404,14 @@ async function loadMyProducts() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/user/${userID}/products`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
     });
+
     if (!response.ok) {
         console.error('Failed to fetch user products');
         return;
     }
+
     const products = await response.json();
     const myProductsList = document.getElementById('my-products-list');
     myProductsList.innerHTML = products.map(product => `
@@ -475,15 +429,15 @@ async function loadMyProducts() {
 async function populateEditForm(productId) {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products/${productId}`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
     });
+
     if (response.status === 401) {
         alert('Unauthorized. Please log in again.');
         window.location.href = '/login';
         return;
     }
+
     const product = await response.json();
     const form = document.getElementById('create-product-form');
     form.querySelector('input[name="id"]').value = product.id;
@@ -501,9 +455,7 @@ async function deleteProduct(productId) {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products/${productId}`, {
         method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (response.ok) {
@@ -515,3 +467,18 @@ async function deleteProduct(productId) {
         alert(`Error: ${error.error}`);
     }
 }
+
+function handleImageTransitions() {
+    const images = document.querySelectorAll('.image-container img');
+    let currentImageIndex = 0;
+
+    function showNextImage() {
+        images[currentImageIndex].style.opacity = 0;
+        currentImageIndex = (currentImageIndex + 1) % images.length;
+        images[currentImageIndex].style.opacity = 1;
+    }
+
+    setInterval(showNextImage, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', handleImageTransitions);
