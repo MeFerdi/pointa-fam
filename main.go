@@ -90,7 +90,7 @@ func main() {
 	})
 
 	// Serve auth.html and login.html through routes
-	r.GET("/auth", func(c *gin.Context) {
+	r.GET("/register", func(c *gin.Context) {
 		c.File("./public/static/auth.html")
 	})
 
@@ -155,7 +155,7 @@ func main() {
 		api.GET("/api/products/category", controllers.GetProductsByCategory)
 		// api.GET("/user/:id/products", controllers.GetProductsByUser)
 		api.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
-		api.GET("/user/:id/profile-picture", controllers.GetProfilePicture)
+		// api.GET("/user/:id/profile-picture", controllers.GetProfilePicture)
 	}
 	api.POST("/products", controllers.CreateProduct)
 	api.PUT("/products/:id", controllers.UpdateProduct)
