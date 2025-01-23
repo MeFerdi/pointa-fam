@@ -5,30 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        .typing-effect {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 3px solid;
-            animation: blink-caret 0.75s step-end infinite;
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: rgb(239, 232, 232); }
-        }
-
-        .bg-homepage {
-            background-image: url('/public/assets/background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-        }
-    </style>
+    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-homepage flex flex-col min-h-screen">
-    <script src="/public/script/script.js"></script>
     <header class="fixed top-0 left-0 right-0 bg-green-600 text-white p-4 shadow-md z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex-shrink-0">
@@ -95,5 +74,6 @@
             &copy; 2025 PointaFam. All rights reserved.
         </div>
     </footer>
+    <script src="/public/script/script.js"></script>
 </body>
 </html>
