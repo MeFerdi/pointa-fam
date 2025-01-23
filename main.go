@@ -106,6 +106,9 @@ func main() {
 	r.GET("/retailer/dashboard", func(c *gin.Context) {
 		c.File("./public/static/retailer_dashboard.html")
 	})
+	r.GET("/cart", func(c *gin.Context) {
+		c.File("./public/static/cart.html")
+	})
 
 	// Authentication routes
 	r.POST("/api/register", controllers.SignUp)
