@@ -5,25 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body class="bg-homepage flex flex-col min-h-screen">
     <header class="fixed top-0 left-0 right-0 bg-green-600 text-white p-4 shadow-md z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex-shrink-0">
-                <a href="/">
+                <a href="/" onclick="handleLogoClick(event)">
                     <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
                 </a>
             </div>
-            <nav id="user-account" class="ml-auto space-x-4">
-                <button onclick="window.location.href='/about'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+            <nav id="user-account" class="ml-auto space-x-4 flex items-center">
+                <button onclick="window.location.href='/about'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-600 transition duration-100">
                     About Us
                 </button>
-                <button onclick="window.location.href='/contact'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                <button onclick="window.location.href='/contact'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-600 transition duration-100">
                     Contact Us
                 </button>
-                <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+                <button onclick="window.location.href='/login'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-400 transition duration-100">
                     Login
+                </button>
+                <!-- Cart Icon -->
+                <button onclick="window.location.href='/login'" class="text-white hover:text-green-200 transition duration-200">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
                 </button>
             </nav>
         </div>
