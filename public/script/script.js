@@ -4,17 +4,36 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
     loadCart();
     loadMyProducts();
+    handleLogoClick();
 });
+
+function handleLogoClick(event) {
+    event.preventDefault(); // Prevent default link behavior
+    const role = localStorage.getItem('role');
+    if (role) {
+        // User is logged in, redirect to homepage without logging out
+        window.location.href = '/';
+    } else {
+        window.location.href = '/';
+    }
+}
 
 function initializePage() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role')
 
-    if (userID && token) {
+    if (userID && token && role) {
         document.getElementById('user-account').innerHTML = `
-            <button onclick="redirectToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
+            <button onclick="redirectToDashboard('${role}')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
             <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Logout</button>
         `;
+    }else{
+        document.getElementById('user-account').innerHTML = `
+        <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
+            Login
+        </button>
+    `;
     }
 
     startTypingAnimation();
@@ -74,6 +93,10 @@ async function handleSignUp(event) {
             localStorage.setItem('token', result.token);
             localStorage.setItem('userID', result.userID);
             localStorage.setItem('role', result.role);
+
+            console.log('Token stored:', localStorage.getItem('token'));
+            console.log('UserID stored:', localStorage.getItem('userID'));
+            console.log('Role stored:', localStorage.getItem('role'));
             redirectToDashboard(result.role);
         } else {
             document.getElementById('signup-result').innerText = result.message || 'Signup failed. Please try again.';
@@ -228,6 +251,28 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
+
+async function loadHomepageProducts() {
+    const response = await fetch('/api/products');
+    if (response.ok) {
+        const products = await response.json();
+        const productsContainer = document.getElementById('products-container');
+        productsContainer.innerHTML = products.map(product => `
+            <div class="product">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p>Price: $${product.price}</p>
+                <p>Quantity: ${product.quantity}</p>
+                <p>Added by: ${product.farmer.name}</p>
+                <img src="${product.image_url}" alt="${product.name}" class="product-image">
+            </div>
+        `).join('');
+    } else {
+        console.error('Failed to load products');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadHomepageProducts);
 
 async function loadProductsByCategory(category, containerId) {
     try {
