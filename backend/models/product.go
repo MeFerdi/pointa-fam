@@ -12,7 +12,8 @@ type Product struct {
 	Quantity    int     `json:"quantity" binding:"required"`
 	ImageURL    string  `json:"image_url"`
 	Category    string  `json:"category" binding:"required"`
-	FarmerID    uint    `json:"farm_id"`
+	FarmerID    uint    `json:"farmer_id" gorm:"index"`            // Foreign key to Farmer
+	Farmer      Farmer  `json:"farmer" gorm:"foreignKey:FarmerID"` // Relationship to Farmer
 	UserID      uint    `json:"user_id"`
 }
 
