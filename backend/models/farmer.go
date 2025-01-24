@@ -7,10 +7,11 @@ import (
 type Farmer struct {
 	gorm.Model
 
-	ID          uint   `gorm:"primaryKey"`
-	Name        string `json:"name"`
-	PhoneNumber string `json:"phoneNumber"`
-	Location    string `json:"location"`
+	ID          uint      `gorm:"primaryKey"`
+	Name        string    `json:"name"`
+	PhoneNumber string    `json:"phoneNumber"`
+	Location    string    `json:"location"`
+	Products    []Product `json:"products" gorm:"foreignKey:FarmerID"` // One-to-many relationship
 }
 
 // CreateFarmer inserts a new farmer into the database
@@ -21,14 +22,14 @@ func (f *Farmer) CreateFarmer(db *gorm.DB) error {
 // GetAllFarmers retrieves all farmers from the database
 func GetAllFarmers(db *gorm.DB) ([]Farmer, error) {
 	var farmers []Farmer
-	err := db.Find(&farmers).Error
+	err := db.Preload("Products").Find(&farmers).Error // Preload Products to include them in the response
 	return farmers, err
 }
 
 // GetFarmerByID retrieves a farmer by their ID
 func GetFarmerByID(db *gorm.DB, id uint) (*Farmer, error) {
 	var farmer Farmer
-	err := db.First(&farmer, id).Error
+	err := db.Preload("Products").First(&farmer, id).Error // Preload Products to include them in the response
 	return &farmer, err
 }
 
