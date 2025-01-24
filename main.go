@@ -33,13 +33,6 @@ func main() {
 		}
 	}
 
-	// Check if the database file exists
-	if _, err := os.Stat(cfg.DBPath); os.IsNotExist(err) {
-		log.Printf("Database file does not exist: %s", cfg.DBPath)
-	} else {
-		log.Printf("Database file exists: %s", cfg.DBPath)
-	}
-
 	// Connect to the database
 	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
@@ -106,6 +99,7 @@ func main() {
 	r.GET("/retailer/dashboard", func(c *gin.Context) {
 		c.File("./public/static/retailer_dashboard.html")
 	})
+
 	r.GET("/cart", func(c *gin.Context) {
 		c.File("./public/static/cart.html")
 	})
@@ -143,30 +137,23 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Thank you for subscribing!"})
 	})
 
-	// Public API endpoint to get products by category
-	r.GET("/api/products", controllers.GetProductsByCategory)
-
 	// Protected routes
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
 		api.GET("/user/:id", controllers.GetUserProfile)
 		api.PUT("/user/:id", controllers.UpdateUserProfile)
-		// api.DELETE("/user/:id", controllers.DeleteUser)
+		api.POST("/user/:id/profile-picture", controllers.UploadProfilePicture)
 
-		// api.GET("/products/:id", controllers.GetProductByID)
-		api.GET("/api/products/category", controllers.GetProductsByCategory)
-		// api.GET("/user/:id/products", controllers.GetProductsByUser)
-		api.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
-		// api.GET("/user/:id/profile-picture", controllers.GetProfilePicture)
+		api.GET("/products/category", controllers.GetProductsByCategory)
+		api.POST("/products", controllers.CreateProduct)
+		api.PUT("/products/:id", controllers.UpdateProduct)
+		api.DELETE("/products/:id", controllers.DeleteProduct)
+
+		api.POST("/cart", controllers.AddToCart)
+		api.GET("/cart/:retailer_id", controllers.ViewCart)
+		api.DELETE("/cart/:item_id", controllers.RemoveFromCart)
 	}
-	api.POST("/products", controllers.CreateProduct)
-	api.PUT("/products/:id", controllers.UpdateProduct)
-	api.DELETE("/products/:id", controllers.DeleteProduct)
-
-	api.POST("/cart", controllers.AddToCart)
-	api.GET("/cart/:retailer_id", controllers.ViewCart)
-	api.DELETE("/cart/:item_id", controllers.RemoveFromCart)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatal(err)
