@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+	"strconv"
+
 	"pointafam/backend/models"
 	"pointafam/backend/services"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -20,23 +21,32 @@ func SetProductService(service *services.ProductService) {
 	productService = service
 }
 
-func GetProducts(c *gin.Context) {
+func GetHomepageProducts(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var products []models.Product
-	if err := db.Find(&products).Error; err != nil {
+	if err := db.Preload("Farmer").Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
 		return
 	}
 	c.JSON(http.StatusOK, products)
 }
 
-// GetProductsByCategory retrieves products by category from the database
+func GetProducts(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	var products []models.Product
+	if err := db.Preload("Farmer").Find(&products).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
 func GetProductsByCategory(c *gin.Context) {
 	category := c.Query("category")
 	var products []models.Product
 
 	db := c.MustGet("db").(*gorm.DB)
-	if err := db.Where("category = ?", category).Find(&products).Error; err != nil {
+	if err := db.Preload("Farmer").Where("category = ?", category).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
 		return
 	}
@@ -44,13 +54,12 @@ func GetProductsByCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
-// GetProductsByUser retrieves products added by a specific user
 func GetProductsByUser(c *gin.Context) {
 	userID := c.Param("id")
 	var products []models.Product
 
 	db := c.MustGet("db").(*gorm.DB)
-	if err := db.Where("user_id = ?", userID).Find(&products).Error; err != nil {
+	if err := db.Preload("Farmer").Where("user_id = ?", userID).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to fetch products"})
 		return
 	}
@@ -63,7 +72,7 @@ func GetProductByID(c *gin.Context) {
 
 	var product models.Product
 	db := c.MustGet("db").(*gorm.DB)
-	if err := db.First(&product, id).Error; err != nil {
+	if err := db.Preload("Farmer").First(&product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
 		return
 	}
@@ -71,7 +80,6 @@ func GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
-// CreateProduct handles the creation of a new product.
 func CreateProduct(c *gin.Context) {
 	var product models.Product
 
@@ -123,14 +131,10 @@ func CreateProduct(c *gin.Context) {
 	} else {
 		log.Printf("Error getting file: %v", err)
 	}
-	userIDStr := c.MustGet("userID").(string)
-	userID, err := strconv.ParseUint(userIDStr, 10, 32)
-	if err != nil {
-		log.Printf("Error converting userID: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to convert userID"})
-		return
-	}
-	product.UserID = uint(userID)
+
+	// Get the logged-in farmer's ID
+	farmerID := c.MustGet("farmerID").(uint) // Assume farmerID is set during authentication
+	product.FarmerID = farmerID
 
 	db := c.MustGet("db").(*gorm.DB)
 	if err := product.CreateProduct(db); err != nil {
