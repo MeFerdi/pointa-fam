@@ -33,6 +33,13 @@ func main() {
 		}
 	}
 
+	// Check if the database file exists
+	if _, err := os.Stat(cfg.DBPath); os.IsNotExist(err) {
+		log.Printf("Database file does not exist: %s", cfg.DBPath)
+	} else {
+		log.Printf("Database file exists: %s", cfg.DBPath)
+	}
+
 	// Connect to the database
 	db, err := gorm.Open(sqlite.Open(cfg.DBPath), &gorm.Config{})
 	if err != nil {
@@ -83,7 +90,7 @@ func main() {
 	})
 
 	// Serve auth.html and login.html through routes
-	r.GET("/register", func(c *gin.Context) {
+	r.GET("/auth", func(c *gin.Context) {
 		c.File("./public/static/auth.html")
 	})
 
@@ -98,10 +105,6 @@ func main() {
 
 	r.GET("/retailer/dashboard", func(c *gin.Context) {
 		c.File("./public/static/retailer_dashboard.html")
-	})
-
-	r.GET("/cart", func(c *gin.Context) {
-		c.File("./public/static/cart.html")
 	})
 
 	// Authentication routes
@@ -137,15 +140,20 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"success": true, "message": "Thank you for subscribing!"})
 	})
 
+	// Public API endpoint to get products by category
+	r.GET("/api/products", controllers.GetProductsByCategory)
+
 	// Protected routes
 	api := r.Group("/api")
 	api.Use(middleware.AuthMiddleware())
 	{
 		api.GET("/user/:id", controllers.GetUserProfile)
 		api.PUT("/user/:id", controllers.UpdateUserProfile)
-		api.POST("/user/:id/profile-picture", controllers.UploadProfilePicture)
+		api.DELETE("/user/:id", controllers.DeleteUser)
 
-		api.GET("/products/category", controllers.GetProductsByCategory)
+		api.GET("/products/:id", controllers.GetProductByID)
+		api.GET("/user/:id/products", controllers.GetProductsByUser)
+		api.POST("/api/user/:id/profile-picture", controllers.UploadProfilePicture)
 		api.POST("/products", controllers.CreateProduct)
 		api.PUT("/products/:id", controllers.UpdateProduct)
 		api.DELETE("/products/:id", controllers.DeleteProduct)

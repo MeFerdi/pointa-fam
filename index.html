@@ -5,65 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/public/css/styles.css">
+    <style>
+       
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap; 
+            border-right: 3px solid; 
+            animation: blink-caret 0.75s step-end infinite;
+            text-decoration-color: aliceblue;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: rgb(239, 232, 232); }
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bg-homepage {
+            background-image: url('/public/assets/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body class="bg-homepage flex flex-col min-h-screen">
+    <script src="/public/script/script.js"></script>
     <header class="fixed top-0 left-0 right-0 bg-green-600 text-white p-4 shadow-md z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex-shrink-0">
-                <a href="/" onclick="handleLogoClick(event)">
+                <a href="/">
                     <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
                 </a>
             </div>
-            <nav id="user-account" class="ml-auto space-x-4 flex items-center">
-                <button onclick="window.location.href='/about'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-600 transition duration-100">
-                    About Us
-                </button>
-                <button onclick="window.location.href='/contact'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-600 transition duration-100">
-                    Contact Us
-                </button>
-                <button onclick="window.location.href='/login'" class="bg-white text-green-400 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-400 transition duration-100">
-                    Login
-                </button>
-                <!-- Cart Icon -->
-                <button onclick="window.location.href='/login'" class="text-white hover:text-green-200 transition duration-200">
-                    <i class="fas fa-shopping-cart fa-lg"></i>
-                </button>
+            <nav id="user-account" class="ml-auto space-x-4">
+                <button onclick="window.location.href='/about'" class="hover:underline">About Us</button>
+                <button onclick="window.location.href='/contact'" class="hover:underline">Contact Us</button>
+                <button onclick="window.location.href='/login'" class="hover:underline">Login</button>
             </nav>
         </div>
     </header>
 
     <main class="container mx-auto flex-grow flex flex-col items-center justify-start text-center pt-32">
-        <!-- Welcome Section -->
         <section class="mb-20 mt-16">
             <h1 id="welcome-message" class="text-6xl font-bold mb-4 typing-effect text-white"></h1>
             <p class="text-lg mb-6 text-white">Connecting farmers with consumers for fresh and organic produce.</p>
         </section>
 
-        <!-- Featured Products Section -->
+        
         <section class="mb-20 w-full">
             <h2 class="text-3xl font-bold mb-8 text-white">Featured Products</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                <!-- Fruits -->
-                <div id="fruits-container" class="space-y-4"></div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
+                    <img src="/public/assets/oranges.jpg" alt="Fruits" class="w-full h-60 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-semibold">Fresh Fruits</h3>
+                        <p>Explore our selection of seasonal fruits.</p>
+                        <button onclick="window.location.href='/products?category=fruits'" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Shop Now</button>
+                    </div>
+                </div>
 
-                <!-- Vegetables -->
-                <div id="vegetables-container" class="space-y-4"></div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
+                    <img src="/public/assets/vegetable.jpg" alt="Vegetables" class="w-full h-60 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-center font-bold">Organic Vegetables</h3>
+                        <p>Discover our fresh organic vegetables.</p>
+                        <button onclick="window.location.href='/products?category=vegetables'" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Shop Now</button>
+                    </div>
+                </div>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
+                    <img src="/public/assets/milk.jpg" alt="Vegetables" class="w-full h-60 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-center font-bold">Dairy Products</h3>
+                        <p>Discover our fresh dairy products.</p>
+                        <button onclick="window.location.href='/products?category=Dairy'" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Shop Now</button>
+                    </div>
+                </div>
 
-                <!-- Dairy -->
-                <div id="dairy-container" class="space-y-4"></div>
             </div>
         </section>
 
-        <!-- About Us Section -->
+       
         <section class="bg-green-100 p-6 rounded-lg mb-20 w-full">
             <h2 class="text-3xl font-bold mb-4">About Us</h2>
             <p>At PointaFam, we believe in sustainable agriculture and connecting local farmers directly to consumers. Our mission is to promote fresh, organic produce while supporting local communities.</p>
             <button onclick="window.location.href='/about'" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Learn More</button>
         </section>
 
-        <!-- Newsletter Section -->
+       
         <section class="mb-20 justify-center text-center w-full">
             <h2 class="text-xl font-bold mb-4 text-white">Join Our Community!</h2>
             <p class="text-white">Sign up for our newsletter to receive updates on new products, special offers, and farming tips.</p>
@@ -72,13 +106,12 @@
             <p id="subscription-message" class="mt-4 text-green-500"></p>
         </section>
     </main>
-
     <!-- Footer -->
     <footer class="sticky bottom-0 bg-green-600 text-white py-4 z-50">
         <div class="container mx-auto text-center">
             &copy; 2025 PointaFam. All rights reserved.
         </div>
     </footer>
-    <script src="/public/script/script.js"></script>
+
 </body>
 </html>

@@ -1,45 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    initializePage();
-    loadUserProfile();
-    loadProducts();
-    loadCart();
-    loadMyProducts();
-    handleLogoClick();
-});
-
-function handleLogoClick(event) {
-    event.preventDefault(); // Prevent default link behavior
-    const role = localStorage.getItem('role');
-    if (role) {
-        // User is logged in, redirect to homepage without logging out
-        window.location.href = '/';
-    } else {
-        window.location.href = '/';
-    }
-}
-
-function initializePage() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role')
+    const role = localStorage.getItem('role');
 
-    if (userID && token && role) {
+    if (userID && token) {
         document.getElementById('user-account').innerHTML = `
-            <button onclick="redirectToDashboard('${role}')" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
+            <button onclick="redirectToDashboard()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200">Dashboard</button>
             <button onclick="logout()" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200 ml-2">Logout</button>
         `;
-    }else{
-        document.getElementById('user-account').innerHTML = `
-        <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
-            Login
-        </button>
-    `;
     }
 
-    startTypingAnimation();
-}
-
-function startTypingAnimation() {
     const messages = ["Welcome to PointaFam", "Connecting farmers with consumers"];
     let currentMessageIndex = 0;
     let currentCharIndex = 0;
@@ -72,7 +42,7 @@ function startTypingAnimation() {
     }
 
     type();
-}
+});
 
 async function handleSignUp(event) {
     event.preventDefault();
@@ -80,68 +50,31 @@ async function handleSignUp(event) {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    try {
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('userID', result.userID);
-            localStorage.setItem('role', result.role);
-
-            console.log('Token stored:', localStorage.getItem('token'));
-            console.log('UserID stored:', localStorage.getItem('userID'));
-            console.log('Role stored:', localStorage.getItem('role'));
-            redirectToDashboard(result.role);
-        } else {
-            document.getElementById('signup-result').innerText = result.message || 'Signup failed. Please try again.';
-        }
-    } catch (error) {
-        console.error('Error during signup:', error);
-        document.getElementById('signup-result').innerText = 'An error occurred. Please try again.';
-    }
-}
-
-async function handleLogin(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    const response = await fetch('/api/login', {
+    const response = await fetch('/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email: formData.get('email'),
-            password: formData.get('password')
-        })
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     });
 
+    const result = await response.json();
     if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('userID', data.userID);
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('role', data.role);
-        redirectToDashboard(data.role);
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('userID', result.userID);
+        localStorage.setItem('role', result.role);
+        window.location.href = result.role === 'farmer' ? '/farmer/dashboard' : '/retailer/dashboard';
     } else {
-        const error = await response.json();
-        document.getElementById('login-result').innerText = `Error: ${error.error}`;
+        document.getElementById('signup-result').innerText = result.message;
     }
 }
 
-function redirectToDashboard(role) {
+function redirectToDashboard() {
+    const role = localStorage.getItem('role');
     if (role === 'farmer') {
         window.location.href = '/farmer/dashboard';
     } else if (role === 'retailer') {
         window.location.href = '/retailer/dashboard';
-    } else {
-        console.error('Unknown or missing role:', role);
-        alert('You are not logged in or your role is unknown. Please log in.');
-        window.location.href = '/login';
     }
 }
 
@@ -160,7 +93,9 @@ function subscribe() {
     if (email) {
         fetch('/subscribe', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ email: email })
         })
         .then(response => response.json())
@@ -176,12 +111,20 @@ function subscribe() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadUserProfile();
+    loadProducts();
+    loadCart();
+});
+
 async function loadUserProfile() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
     if (userID && token) {
         const response = await fetch(`/api/user/${userID}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
         if (response.ok) {
             const user = await response.json();
@@ -199,12 +142,14 @@ async function loadUserProfile() {
         console.error('User ID or token not found');
     }
 }
-
 function toggleDropdown(id) {
     const element = document.getElementById(id);
-    element.classList.toggle('hidden');
+    if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+    } else {
+        element.classList.add('hidden');
+    }
 }
-
 async function uploadProfilePicture(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -217,7 +162,9 @@ async function uploadProfilePicture(event) {
 
     const response = await fetch(`/api/user/${userID}/profile-picture`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         body: formData
     });
 
@@ -228,7 +175,6 @@ async function uploadProfilePicture(event) {
         alert('Failed to upload profile picture');
     }
 }
-
 async function handleProfileUpdate(event) {
     event.preventDefault();
     const userID = localStorage.getItem('userID');
@@ -238,7 +184,9 @@ async function handleProfileUpdate(event) {
 
     const response = await fetch(`/api/user/${userID}`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         body: formData
     });
 
@@ -251,197 +199,101 @@ async function handleProfileUpdate(event) {
         alert(`Error: ${error.error}`);
     }
 }
-
-async function loadHomepageProducts() {
-    const response = await fetch('/api/products');
-    if (response.ok) {
-        const products = await response.json();
-        const productsContainer = document.getElementById('products-container');
-        productsContainer.innerHTML = products.map(product => `
-            <div class="product">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <p>Price: $${product.price}</p>
-                <p>Quantity: ${product.quantity}</p>
-                <p>Added by: ${product.farmer.name}</p>
-                <img src="${product.image_url}" alt="${product.name}" class="product-image">
-            </div>
-        `).join('');
-    } else {
-        console.error('Failed to load products');
+async function loadProducts(category = '') {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/products?category=${category}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (response.status === 401) {
+        alert('Unauthorized. Please log in again.');
+        window.location.href = '/login';
+        return;
     }
-}
-
-document.addEventListener('DOMContentLoaded', loadHomepageProducts);
-
-async function loadProductsByCategory(category, containerId) {
-    try {
-        const response = await fetch(`/api/products/category?category=${category}`);
-        if (!response.ok) throw new Error(`Failed to fetch ${category} products`);
-        const products = await response.json();
-        const container = document.getElementById(containerId);
-        container.innerHTML = products.map(product => `
-            <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition duration-200">
-                <img src="${product.imageURL}" alt="${product.name}" class="w-full h-60 object-cover">
-                <div class="p-4">
-                    <h3 class="text-xl font-semibold">${product.name}</h3>
-                    <p>${product.description}</p>
-                    <p class="text-gray-600">$${product.price}</p>
-                    <button onclick="window.location.href='/product/${product.id}'" class="mt-2 bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">View Details</button>
-                </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error(error);
-        const container = document.getElementById(containerId);
-        container.innerHTML = `<p class="text-red-500">Failed to load ${category} products. Please try again later.</p>`;
-    }
+    const products = await response.json();
+    const productsList = document.getElementById('products-list');
+    productsList.innerHTML = products.map(product => `
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+            <p class="text-gray-600">${product.description}</p>
+            <p class="text-gray-600">$${product.price}</p>
+            <p class="text-gray-600">${product.quantity} in stock</p>
+            <button onclick="addToCart(${product.id})" class="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200">Add to Cart</button>
+        </div>
+    `).join('');
 }
 
 async function loadCart() {
-    try {
-        const response = await fetch('/api/cart', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to load cart');
+    const userID = localStorage.getItem('userID');
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/cart/${userID}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
         }
-
-        const cart = await response.json();
-
-        const cartItemsContainer = document.getElementById('cart-items');
-        const emptyCartMessage = document.getElementById('empty-cart-message');
-        const cartTotal = document.getElementById('cart-total');
-
-        // Clear existing items
-        cartItemsContainer.innerHTML = '';
-
-        if (cart.items.length === 0) {
-            // Show empty cart message
-            emptyCartMessage.classList.remove('hidden');
-            cartTotal.textContent = '0.00';
-            return;
-        }
-
-        // Hide empty cart message
-        emptyCartMessage.classList.add('hidden');
-
-        // Render cart items
-        let total = 0;
-        cart.items.forEach(item => {
-            const itemTotal = item.product.price * item.quantity;
-            total += itemTotal;
-
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item bg-white p-4 rounded-lg shadow-md';
-            cartItem.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center">
-                        <img src="${item.product.imageURL}" alt="${item.product.name}" class="w-12 h-12 rounded-lg mr-4">
-                        <div>
-                            <h3 class="text-lg font-semibold">${item.product.name}</h3>
-                            <p class="text-gray-600">Quantity: ${item.quantity}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-lg font-bold">$${itemTotal.toFixed(2)}</p>
-                        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-600">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            cartItemsContainer.appendChild(cartItem);
-        });
-
-        // Update total
-        cartTotal.textContent = total.toFixed(2);
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to load cart. Please try again.');
+    });
+    if (response.status === 500) {
+        alert('Error loading cart. Please try again later.');
+        return;
     }
+    const cartItems = await response.json();
+    const cartList = document.getElementById('cart-list');
+    cartList.innerHTML = cartItems.length === 0 ? '<p class="text-center text-gray-600">Cart empty</p>' : cartItems.map(item => `
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold mb-2">${item.product.name}</h3>
+            <p class="text-gray-600">${item.product.description}</p>
+            <p class="text-gray-600">$${item.product.price}</p>
+            <p class="text-gray-600">${item.quantity} in cart</p>
+            <button onclick="removeFromCart(${item.id})" class="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200">Remove</button>
+        </div>
+    `).join('');
 }
 
-async function removeFromCart(itemId) {
-    try {
-        const response = await fetch(`/api/cart/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
+async function addToCart(productId) {
+    const userID = localStorage.getItem('userID');
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId: productId, userID: parseInt(userID), quantity: 1 })
+    });
 
-        if (!response.ok) {
-            throw new Error('Failed to remove item from cart');
-        }
-
-        // Reload the cart after removing an item
+    if (response.ok) {
+        alert('Product added to cart');
         loadCart();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to remove item from cart. Please try again.');
+    } else {
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
     }
 }
 
-async function updateCartCount() {
-    try {
-        const response = await fetch('/api/cart/count', {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch cart count');
-        const data = await response.json();
-        document.getElementById('cart-count').textContent = data.count;
-    } catch (error) {
-        console.error('Error:', error);
+async function removeFromCart(cartItemId) {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/cart/${cartItemId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (response.ok) {
+        alert('Product removed from cart');
+        loadCart();
+    } else {
+        const error = await response.json();
+        alert(`Error: ${error.error}`);
     }
 }
 
 function showCart() {
     document.getElementById('cart-modal').classList.remove('hidden');
-    loadCart();
 }
 
 function hideCart() {
     document.getElementById('cart-modal').classList.add('hidden');
-}
-
-async function checkout() {
-    async function updateQuantity(itemId, quantity) {
-        try {
-            const response = await fetch(`/api/cart/${itemId}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity: parseInt(quantity) }),
-            });
-    
-            if (!response.ok) throw new Error('Failed to update quantity');
-            loadCart();
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to update quantity. Please try again.');
-        }
-    }
-    try {
-        const response = await fetch('/api/checkout', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to checkout');
-        alert('Checkout successful!');
-        hideCart();
-        updateCartCount();
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to checkout. Please try again.');
-    }
 }
 
 async function handleFormSubmit(event, url, method) {
@@ -449,13 +301,12 @@ async function handleFormSubmit(event, url, method) {
     const form = event.target;
     const formData = new FormData(form);
     const token = localStorage.getItem('token');
-    const userID = localStorage.getItem('userID');
-
-    formData.append('userID', userID);
 
     const response = await fetch(url, {
         method: method,
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         body: formData
     });
 
@@ -475,14 +326,10 @@ async function loadMyProducts() {
     const userID = localStorage.getItem('userID');
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/user/${userID}/products`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
-
-    if (!response.ok) {
-        console.error('Failed to fetch user products');
-        return;
-    }
-
     const products = await response.json();
     const myProductsList = document.getElementById('my-products-list');
     myProductsList.innerHTML = products.map(product => `
@@ -500,15 +347,15 @@ async function loadMyProducts() {
 async function populateEditForm(productId) {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products/${productId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
-
     if (response.status === 401) {
         alert('Unauthorized. Please log in again.');
         window.location.href = '/login';
         return;
     }
-
     const product = await response.json();
     const form = document.getElementById('create-product-form');
     form.querySelector('input[name="id"]').value = product.id;
@@ -526,7 +373,9 @@ async function deleteProduct(productId) {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/products/${productId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     });
 
     if (response.ok) {
@@ -538,18 +387,3 @@ async function deleteProduct(productId) {
         alert(`Error: ${error.error}`);
     }
 }
-
-function handleImageTransitions() {
-    const images = document.querySelectorAll('.image-container img');
-    let currentImageIndex = 0;
-
-    function showNextImage() {
-        images[currentImageIndex].style.opacity = 0;
-        currentImageIndex = (currentImageIndex + 1) % images.length;
-        images[currentImageIndex].style.opacity = 1;
-    }
-
-    setInterval(showNextImage, 5000);
-}
-
-document.addEventListener('DOMContentLoaded', handleImageTransitions);

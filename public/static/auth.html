@@ -3,85 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - PointaFam</title>
+    <title>Sign Up</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/public/css/styles.css">
 </head>
-<body class="bg-gray-100">
-    <!-- Fixed Header -->
-    <header class="fixed-header">
-        <div class="container mx-auto flex justify-between items-center p-4">
-            <a href="/">
-                <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
-            </a>
-            <nav id="user-account" class="space-x-4">
-                <button onclick="window.location.href='/about'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
-                    About Us
-                </button>
-                <button onclick="window.location.href='/contact'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
-                    Contact Us
-                </button>
-                <button onclick="window.location.href='/login'" class="bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-100 hover:text-green-700 transition duration-200">
-                    Login
-                </button>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Layout Container -->
-    <div class="layout-container">
-        <!-- Image Container (Left Side) -->
-        <div class="image-container">
-            <img src="/public/assets/farmer.jpg" alt="Farmer" class="farmer-image">
-            <img src="/public/assets/retailer.jpg" alt="Retailer" class="retailer-image">
-        </div>
-
-        <!-- Form Container (Right Side) -->
-        <div class="form-container">
-            <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-                <h1 class="text-3xl font-bold text-center mb-6">Sign Up</h1>
-                <form id="signup-form" onsubmit="handleSignUp(event)">
-                    <div class="mb-4">
-                        <input type="text" name="username" placeholder="Username" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <input type="email" name="email" placeholder="Email Address" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <input type="password" name="password" placeholder="Password" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <input type="password" name="confirm_password" placeholder="Confirm Password" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <input type="text" name="phoneNumber" placeholder="Phone Number" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <input type="text" name="location" placeholder="Location" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <select name="role" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                            <option value="">Select Role</option>
-                            <option value="farmer">Farmer</option>
-                            <option value="retailer">Retailer</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="bg-blue-500 text-white p-3 rounded w-full hover:bg-blue-600 transition duration-200">Sign Up</button>
-                </form>
-                <div id="signup-result" class="mt-4 text-center text-red-500"></div>
-                <p class="mt-4 text-center">Already have an account? 
-                   <a href="/login" class="text-blue-500 underline">Login here</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Fixed Footer -->
-    <footer class="fixed-footer">
-        <div class="container mx-auto text-center">
-            &copy; 2025 PointaFam. All rights reserved.
-        </div>
-    </footer>
+<body class="bg-gray-100 p-4">
     <script src="/public/script/script.js"></script>
+    <div class="container mx-auto max-w-md bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">Sign Up</h1>
+        <form id="signup-form" onsubmit="handleSignUp(event)">
+            <div class="mb-4">
+                <input type="text" name="username" placeholder="Username" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <input type="email" name="email" placeholder="Email Address" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="password" placeholder="Password" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <input type="password" name="confirm_password" placeholder="Confirm Password" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <input type="text" name="phoneNumber" placeholder="Phone Number" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-4">
+                <input type="text" name="location" placeholder="Location" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <select name="role" class="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="">Select Role</option>
+                    <option value="farmer">Farmer</option>
+                    <option value="retailer">Retailer</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-500 text-white p-3 rounded w-full hover:bg-blue-600 transition duration-200">Sign Up</button>
+        </form>
+        <div id="signup-result" class="mt-4 text-center text-red-500"></div>
+        <p class="mt-4 text-center">Already have an account? 
+           <a href="/login" class="text-blue-500 underline">Login here</a>
+        </p>
+    </div>
 </body>
 </html>
