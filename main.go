@@ -97,6 +97,9 @@ func main() {
 	r.GET("/login", func(c *gin.Context) {
 		c.File("./public/static/login.html")
 	})
+	r.GET("/register", func(c *gin.Context) {
+		c.File("./public/static/auth.html")
+	})
 
 	// Serve farmer and retailer dashboards
 	r.GET("/farmer/dashboard", func(c *gin.Context) {
