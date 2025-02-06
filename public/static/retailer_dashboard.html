@@ -23,7 +23,7 @@
                     }
                 });
                 const user = await response.json();
-                document.getElementById('user-name').innerText = `${user.firstName} ${user.lastName}`;
+                document.getElementById('user-name').innerText = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-email').innerText = user.email;
                 document.getElementById('user-location').innerText = `Location: ${user.location}`;
             }
