@@ -1,0 +1,70 @@
+<div id="cart-list" class="bg-white shadow-md rounded-lg p-6 mb-6">
+    <h2 class="text-2xl font-bold mb-4">Your Cart</h2>
+    <ul>
+        {{ range .cartItems }}
+        <li class="border-b py-4 last:border-b-0">
+            <div class="flex justify-between items-center">
+                <div class="flex-grow">
+                    <h3 class="text-lg font-bold">{{ .Product.Name }}</h3>
+                    <p class="text-gray-600">Price: ${{ printf "%.2f" .Product.Price }}</p>
+                    <p class="text-gray-600">Quantity: {{ .Quantity }}</p>
+                    <p class="font-semibold">Subtotal: ${{ printf "%.2f" (multiply .Product.Price .Quantity) }}</p>
+                </div>
+                <div>
+                    <button data-id="{{ .ID }}" onclick="removeFromCart(this)" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200">Remove</button>
+                </div>
+            </div>
+        </li>
+        {{ end }}
+    </ul>
+</div>
+
+<script>
+    async function removeFromCart(button) {
+        const cartItemId = button.getAttribute('data-id');
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/cart/${cartItemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.ok) {
+            alert('Product removed from cart');
+            loadCart();
+        } else {
+            const error = await response.json();
+            alert(`Error: ${error.error}`);
+        }
+    }
+
+    async function loadCart() {
+        const userID = localStorage.getItem('userID');
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/cart/${userID}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (response.status === 500) {
+            alert('Error loading cart. Please try again later.');
+            return;
+        }
+        const cartItems = await response.json();
+        const cartList = document.getElementById('cart-list');
+        cartList.innerHTML = cartItems.map(item => `
+            <li class="border p-2 mb-2">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold">${item.product.name}</h3>
+                        <p>Quantity: ${item.quantity}</p>
+                    </div>
+                    <div>
+                        <button data-id="${item.id}" onclick="removeFromCart(this)" class="bg-red-500 text-white p-2 rounded">Remove</button>
+                    </div>
+                </div>
+            </li>
+        `).join('');
+    }
+</script>
