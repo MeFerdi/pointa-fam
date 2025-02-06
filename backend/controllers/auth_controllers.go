@@ -3,9 +3,10 @@ package controllers
 import (
 	"log"
 	"net/http"
-	"pointafam/backend/models"
 	"strconv"
 	"time"
+
+	"pointafam/backend/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -13,8 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-var jwtKey = []byte("your_secret_key")
+var (
+	db     *gorm.DB
+	jwtKey = []byte("your_secret_key")
+)
 
 func SetDB(database *gorm.DB) {
 	db = database
@@ -22,13 +25,13 @@ func SetDB(database *gorm.DB) {
 
 func SignUp(c *gin.Context) {
 	var SignupInput struct {
-		FirstName       string `json:"firstName" binding:"required"`
-		LastName        string `json:"lastName" binding:"required"`
+		FirstName       string `json:"first_name" binding:"required"`
+		LastName        string `json:"last_name" binding:"required"`
 		Email           string `json:"email" binding:"required,email"`
 		Password        string `json:"password" binding:"required"`
 		ConfirmPassword string `json:"confirm_password" binding:"required"`
-		PhoneNumber     string `json:"phoneNumber"`
-		Role            string `json:"role" binding:"required,oneof=farmer retailer"` // Validate role
+		PhoneNumber     string `json:"phone_number"`
+		Role            string `json:"role" binding:"required,oneof=farmer retailer"`
 	}
 
 	if err := c.ShouldBindJSON(&SignupInput); err != nil {
@@ -50,11 +53,11 @@ func SignUp(c *gin.Context) {
 	}
 
 	user := models.User{
+		FirstName:   SignupInput.FirstName,
+		LastName:    SignupInput.LastName,
 		Email:       SignupInput.Email,
 		Password:    string(hashedPassword),
 		PhoneNumber: SignupInput.PhoneNumber,
-		FirstName:   SignupInput.FirstName,
-		LastName:    SignupInput.LastName,
 		Role:        SignupInput.Role,
 	}
 
@@ -136,19 +139,5 @@ func GetUserProfile(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 		return
 	}
-	c.JSON(http.StatusOK, user)
-}
-
-func UpdateUserProfile(c *gin.Context) {
-	var user models.User
-	if err := db.First(&user, c.Param("id")).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
-		return
-	}
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid input"})
-		return
-	}
-	db.Save(&user)
 	c.JSON(http.StatusOK, user)
 }
