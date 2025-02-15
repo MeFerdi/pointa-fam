@@ -5,40 +5,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - PointaFam</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .nav-button {
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .nav-button:hover {
+            color: #45a049;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #4CAF50, #81C784);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="header flex justify-between items-center p-4 bg-white shadow-md">
+<body>
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4">
         <a href="/">
-            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo">
+            <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
         </a>
-        <div id="user-account" class="nav-buttons">
-            <button onclick="window.location.href='/about'">About Us</button>
-            <button onclick="window.location.href='/contact'">Contact Us</button>
-            <button onclick="window.location.href='/login'">Login</button>
+        <nav class="flex space-x-4">
+            <a href="/about" class="nav-button">About Us</a>
+            <a href="/contact" class="nav-button">Contact Us</a>
+            <a href="/login" class="nav-button">Login</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto mt-20 p-6">
+        <!-- Hero Section -->
+        <section class="hero-section text-center">
+            <h1 class="text-5xl font-bold mb-4">About PointaFam</h1>
+            <p class="text-xl">Empowering farmers and retailers through a direct, transparent, and sustainable marketplace.</p>
+        </section>
+
+        <!-- Mission Section -->
+        <div class="section-card">
+            <h2 class="text-3xl font-bold mb-4">Our Mission</h2>
+            <p class="text-gray-600">At PointaFam, we are on a mission to revolutionize the agricultural supply chain by connecting farmers directly with retailers. Our goal is to eliminate middlemen, reduce costs, and ensure fair prices for both farmers and consumers.</p>
         </div>
-    </div>
 
-    <div class="container mx-auto mt-10 text-center">
-        <h1 class="text-4xl font-bold mb-6">About PointaFam</h1>
-        <p class="text-lg mb-6">At PointaFam, we believe in connecting farmers directly with consumers to provide fresh, organic produce while supporting local agriculture.</p>
+        <!-- Why Choose Us Section -->
+        <div class="section-card">
+            <h2 class="text-3xl font-bold mb-4">Why Choose PointaFam?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stat-card">
+                    <i class="fas fa-tractor text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Direct Connection</h3>
+                    <p class="text-gray-600">Farmers and retailers connect directly, ensuring transparency and fair pricing.</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-leaf text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Sustainable Practices</h3>
+                    <p class="text-gray-600">We promote eco-friendly farming and sustainable supply chains.</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-handshake text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">Community Focus</h3>
+                    <p class="text-gray-600">We build strong communities by supporting local farmers and businesses.</p>
+                </div>
+            </div>
+        </div>
 
-        <h2 class="text-2xl font-bold mb-4">Our Mission</h2>
-        <p class="mb-6">Our mission is to create a sustainable and transparent marketplace that empowers farmers and enriches the lives of consumers.</p>
+        <!-- How It Works Section -->
+        <div class="section-card">
+            <h2 class="text-3xl font-bold mb-4">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stat-card">
+                    <i class="fas fa-user-plus text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">1. Sign Up</h3>
+                    <p class="text-gray-600">Farmers and retailers create accounts to join the platform.</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-search text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">2. Connect</h3>
+                    <p class="text-gray-600">Retailers browse and connect with farmers for fresh produce.</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-shopping-cart text-4xl text-green-500 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2">3. Trade</h3>
+                    <p class="text-gray-600">Farmers and retailers trade directly, ensuring quality and transparency.</p>
+                </div>
+            </div>
+        </div>
 
-        <h2 class="text-2xl font-bold mb-4">Our Values</h2>
-        <ul class="list-disc list-inside mb-6">
-            <li>Integrity: We uphold honesty and transparency in all our dealings.</li>
-            <li>Sustainability: We promote eco-friendly practices and support local farming.</li>
-            <li>Community: We strive to build a strong community of farmers and consumers.</li>
-        </ul>
+        <!-- Join Us Section -->
+        <div class="section-card text-center">
+            <h2 class="text-3xl font-bold mb-4">Join the Movement</h2>
+            <p class="text-gray-600 mb-6">Whether you're a farmer or a retailer, PointaFam is here to empower you. Join us today and be part of a sustainable agricultural revolution.</p>
+            <a href="/signup" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-200">Sign Up Now</a>
+        </div>
+    </main>
 
-        <h2 class="text-2xl font-bold mb-4">Meet Our Team</h2>
-        <p class="mb-6">Our dedicated team is passionate about agriculture and committed to making a positive impact in the community.</p>
-
-        <img src="/public/assets/team.jpg" alt="Our Team" class="w-full h-auto rounded-lg mb-6">
-
-        <h2 class="text-2xl font-bold mb-4">Join Us!</h2>
-        <p>If you're a farmer or consumer interested in joining our community, please visit our Contact Us page for more information.</p>
-    </div>
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white py-6 mt-12">
+        <div class="container mx-auto text-center">
+            &copy; 2025 PointaFam. All rights reserved.
+        </div>
+    </footer>
 </body>
 </html>
