@@ -71,7 +71,7 @@
                 return;
             }
 
-            const response = await fetch('/api/signup', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -80,6 +80,7 @@
                     username: formData.get('username'),
                     email: formData.get('email'),
                     password: formData.get('password'),
+                    confirm_password: formData.get('confirm_password'),
                     phoneNumber: formData.get('phoneNumber'),
                     location: formData.get('location'),
                     role: formData.get('role')
