@@ -107,6 +107,11 @@ func main() {
 		c.File("./public/static/retailer_dashboard.html")
 	})
 
+	// Serve product.html
+	r.GET("/product.html", func(c *gin.Context) {
+		c.File("./public/static/product.html")
+	})
+
 	// Authentication routes
 	r.POST("/api/register", controllers.SignUp)
 	r.POST("/api/login", controllers.Login)
