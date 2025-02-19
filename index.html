@@ -72,7 +72,7 @@
                     <img src="/public/assets/PointaFam.jpg" alt="PointaFam Logo" class="h-12">
                 </a>
             </div>
-            <nav class="flex space-x-4">
+            <nav id="nav-links" class="flex space-x-4">
                 <a href="/about" class="text-gray-700 hover:text-green-500 transition duration-200">About Us</a>
                 <a href="/contact" class="text-gray-700 hover:text-green-500 transition duration-200">Contact Us</a>
                 <a href="/login" class="text-gray-700 hover:text-green-500 transition duration-200">Login</a>
@@ -85,7 +85,7 @@
         <div>
             <h1 class="text-5xl font-bold mb-4">Fresh & Organic Produce</h1>
             <p class="text-xl mb-6">Connecting farmers with consumers for the freshest and healthiest products.</p>
-            <button onclick="window.location.href='/products'" class="bg-white text-green-600 px-6 py-3 rounded-lg hover:bg-green-50 transition duration-200">Explore Products</button>
+            <button onclick="window.location.href='/product.html'" class="bg-white text-green-600 px-6 py-3 rounded-lg hover:bg-green-50 transition duration-200">Explore Products</button>
         </div>
     </section>
 
@@ -162,6 +162,34 @@
                 subscriptionMessage.textContent = "Please enter a valid email address.";
             }
         }
+
+        // Check if user is logged in and update navigation links
+        document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        const navLinks = document.getElementById('nav-links');
+
+        if (token) {
+            let dashboardLink = '';
+            if (role === 'farmer') {
+                dashboardLink = '<a href="/farmer/dashboard" class="text-gray-700 hover:text-green-500 transition duration-200">Dashboard</a>';
+            } else if (role === 'retailer') {
+                dashboardLink = '<a href="/retailer/dashboard" class="text-gray-700 hover:text-green-500 transition duration-200">Dashboard</a>';
+            }
+
+            navLinks.innerHTML = `
+                <a href="/about" class="text-gray-700 hover:text-green-500 transition duration-200">About Us</a>
+                <a href="/contact" class="text-gray-700 hover:text-green-500 transition duration-200">Contact Us</a>
+                ${dashboardLink}
+            `;
+        } else {
+            navLinks.innerHTML = `
+                <a href="/about" class="text-gray-700 hover:text-green-500 transition duration-200">About Us</a>
+                <a href="/contact" class="text-gray-700 hover:text-green-500 transition duration-200">Contact Us</a>
+                <a href="/login" class="text-gray-700 hover:text-green-500 transition duration-200">Login</a>
+            `;
+        }
+    });
     </script>
 </body>
 </html>
