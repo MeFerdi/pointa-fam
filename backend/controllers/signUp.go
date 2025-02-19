@@ -3,9 +3,10 @@ package controllers
 import (
 	"log"
 	"net/http"
-	"pointafam/backend/models"
 	"strconv"
 	"time"
+
+	"pointafam/backend/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -13,8 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-var jwtKey = []byte("your_secret_key")
+var (
+	db     *gorm.DB
+	jwtKey = []byte("your_secret_key")
+)
 
 func SetDB(database *gorm.DB) {
 	db = database
@@ -26,7 +29,6 @@ func SignUp(c *gin.Context) {
 		Email           string `json:"email" binding:"required,email"`
 		Password        string `json:"password" binding:"required"`
 		ConfirmPassword string `json:"confirm_password" binding:"required"`
-		PhoneNumber     string `json:"phoneNumber"`
 		Location        string `json:"location"`
 		Role            string `json:"role" binding:"required,oneof=farmer retailer"` // Validate role
 	}
@@ -50,12 +52,11 @@ func SignUp(c *gin.Context) {
 	}
 
 	user := models.User{
-		Username:    SignupInput.Username,
-		Email:       SignupInput.Email,
-		Password:    string(hashedPassword),
-		PhoneNumber: SignupInput.PhoneNumber,
-		Location:    SignupInput.Location,
-		Role:        SignupInput.Role,
+		Username: SignupInput.Username,
+		Email:    SignupInput.Email,
+		Password: string(hashedPassword),
+		Location: SignupInput.Location,
+		Role:     SignupInput.Role,
 	}
 
 	if err := db.Create(&user).Error; err != nil {
@@ -69,9 +70,8 @@ func SignUp(c *gin.Context) {
 		farmer := models.Farmer{
 			ID: user.ID,
 
-			Name:        user.Username,
-			PhoneNumber: SignupInput.PhoneNumber,
-			Location:    SignupInput.Location,
+			Name:     user.Username,
+			Location: SignupInput.Location,
 		}
 		if err := db.Create(&farmer).Error; err != nil {
 			log.Printf("Could not create farmer: %v", err)
@@ -80,10 +80,9 @@ func SignUp(c *gin.Context) {
 		}
 	} else if SignupInput.Role == "retailer" {
 		retailer := models.Retailer{
-			ID:          user.ID,
-			Name:        user.Username,
-			PhoneNumber: SignupInput.PhoneNumber,
-			Location:    SignupInput.Location,
+			ID:       user.ID,
+			Name:     user.Username,
+			Location: SignupInput.Location,
 		}
 		if err := db.Create(&retailer).Error; err != nil {
 			log.Printf("Could not create retailer: %v", err)
@@ -111,6 +110,7 @@ func SignUp(c *gin.Context) {
 		"role":    user.Role,
 	})
 }
+
 func GetUserProfile(c *gin.Context) {
 	var user models.User
 	if err := db.First(&user, c.Param("id")).Error; err != nil {
