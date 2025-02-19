@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"path/filepath"
+
 	"pointafam/backend/models"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +28,6 @@ func UpdateUserProfile(c *gin.Context) {
 	}
 
 	user.Username = updateUserInput.Username
-	user.PhoneNumber = updateUserInput.PhoneNumber
 	user.Location = updateUserInput.Location
 
 	// Handle profile picture upload
